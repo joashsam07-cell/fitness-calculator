@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Primary SEO Meta Tags for Google Search -->
+    <title>Fitness & BMI Calculator Pro | Body Fat & Waist Ratios by Joash Sam</title>
+    <meta name="title" content="Fitness & BMI Calculator Pro | Body Fat & Waist Ratios by Joash Sam">
+    <meta name="description" content="Free online health and fitness calculator by Joash Sam. Instantly measure your BMI, Body Fat Percentage, Waist-to-Hip Ratio (WHR), and Waist-to-Height Ratio (WHtR) with custom recommendations.">
+    <meta name="keywords" content="fitness calculator, BMI calculator, body fat percentage calculator, waist to hip ratio, WHR, WHtR, health analytics, Joash Sam">
+    <meta name="author" content="Joash Sam">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph / WhatsApp Preview Meta Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Fitness & BMI Calculator Pro by Joash Sam">
+    <meta property="og:description" content="Calculate your BMI, Body Fat %, WHR, and WHtR instantly. Get tailored fitness feedback and target ranges.">
+
+    <style>
+        :root { 
+            --primary: #1a73e8; 
+            --bg: #f8f9fa; 
+            --card: #ffffff;
+            --green-bg: #e8f5e9; --green-text: #2e7d32; --green-border: #a5d6a7;
+            --orange-bg: #fff3e0; --orange-text: #e65100; --orange-border: #ffcc80;
+            --red-bg: #ffebee; --red-text: #c62828; --red-border: #ef9a9a;
+            --navy: #1a3c5e; 
+        }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); display: flex; flex-direction: column; align-items: center; padding: 20px; color: #3c4043; min-height: 100vh; margin: 0; box-sizing: border-box; }
+        .card { background: var(--card); padding: 2rem; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.06); width: 100%; max-width: 520px; box-sizing: border-box; }
+        
+        .brand-header { text-align: center; margin-bottom: 25px; }
+        .brand-text h1 { font-size: 1.8rem; color: var(--navy); margin: 0; line-height: 1.1; font-weight: 800; }
+        .brand-text p { font-size: 0.9rem; color: #5f6368; margin: 4px 0 0; font-weight: 600; letter-spacing: 0.5px; }
+
+        .tabs { display: flex; background: #f1f3f4; border-radius: 12px; padding: 4px; margin-bottom: 25px; }
+        .tab { flex: 1; text-align: center; padding: 12px 5px; cursor: pointer; border-radius: 10px; font-weight: 700; color: #5f6368; transition: 0.3s; font-size: 0.85rem; }
+        .tab.active { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(26,115,232,0.2); }
+        
+        .section { display: none; animation: slideUp 0.4s ease-out; }
+        .section.active { display: block; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        .input-box { position: relative; }
+        label { display: block; font-size: 0.75rem; font-weight: 700; color: #70757a; margin-bottom: 6px; text-transform: uppercase; }
+        input, select { width: 100%; padding: 12px; border: 1.5px solid #dadce0; border-radius: 10px; box-sizing: border-box; font-size: 0.95rem; outline: none; }
+        
+        .unit-sel { position: absolute; right: 8px; top: 32px; font-size: 0.7rem; border: none; background: #f1f3f4; padding: 4px 6px; border-radius: 6px; width: auto; color: var(--primary); font-weight: bold; cursor: pointer; }
+        .dual-input { display: flex; gap: 5px; }
+        .hidden { display: none; }
+
+        button { width: 100%; padding: 16px; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 10px; font-size: 1rem; transition: background 0.2s; }
+        button:hover { background: #1557b0; }
+
+        .results-container { margin-top: 25px; display: flex; flex-direction: column; gap: 15px; }
+        .result-card { border-radius: 14px; padding: 16px; border: 1px solid; display: flex; flex-direction: column; gap: 8px; }
+        .res-top { display: flex; justify-content: space-between; align-items: center; }
+        .res-label { font-weight: 700; font-size: 0.95rem; }
+        .res-val { font-weight: 800; font-size: 1.3rem; }
+        
+        .status-badge { font-size: 0.65rem; font-weight: 800; padding: 4px 8px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .res-target { font-size: 0.75rem; font-weight: 600; opacity: 0.85; margin-top: 2px; }
+        
+        .tip-box { background: rgba(255, 255, 255, 0.6); padding: 10px 12px; border-radius: 8px; font-size: 0.8rem; line-height: 1.45; font-weight: 500; border-left: 3px solid; margin-top: 4px; }
+        
+        .disclaimer { font-size: 0.7rem; color: #5f6368; line-height: 1.5; background: #f8f9fa; padding: 15px; border-radius: 12px; margin-top: 30px; border: 1px solid #dadce0; text-align: center; }
+
+        /* SEO Content Block for Google Bots */
+        .seo-info-container { width: 100%; max-width: 520px; margin-top: 30px; font-size: 0.82rem; color: #5f6368; line-height: 1.6; }
+        .seo-info-container h2 { font-size: 1.05rem; color: var(--navy); margin-top: 15px; margin-bottom: 5px; }
+        .seo-info-container ul { padding-left: 18px; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="brand-header">
+        <div class="brand-text">
+            <h1>Fitness Calculator</h1>
+            <p>by Joash Sam</p>
+        </div>
+    </div>
+
+    <div class="tabs">
+        <div class="tab active" onclick="showTab('bmi-sec')">BMI Check</div>
+        <div class="tab" onclick="showTab('fit-sec')">Fitness Pro</div>
+    </div>
+
+    <!-- BMI Section -->
+    <div id="bmi-sec" class="section active">
+        <div class="grid">
+            <div><label>Age</label><input type="number" id="bmi-age" placeholder="Years"></div>
+            <div><label>Gender</label><select id="bmi-gender"><option value="male">Male</option><option value="female">Female</option></select></div>
+        </div>
+        <div class="grid">
+            <div class="input-box"><label>Weight</label><input type="number" id="bmi-w"><select class="unit-sel" id="bmi-w-unit"><option value="kg">kg</option><option value="lb">lb</option></select></div>
+            <div class="input-box">
+                <label>Height</label>
+                <input type="number" id="bmi-h-cm" placeholder="cm">
+                <div class="dual-input hidden" id="bmi-h-ftin"><input type="number" id="bmi-h-ft" placeholder="Ft"><input type="number" id="bmi-h-in" placeholder="In"></div>
+                <select class="unit-sel" id="bmi-h-unit" onchange="toggleHeight('bmi')"><option value="cm">cm</option><option value="ft">ft+in</option></select>
+            </div>
+        </div>
+        <button onclick="calculateOnlyBMI()">Calculate BMI</button>
+        <div id="bmi-only-res" class="results-container"></div>
+    </div>
+
+    <!-- Fitness Pro Section -->
+    <div id="fit-sec" class="section">
+        <div class="grid">
+            <div><label>Age</label><input type="number" id="fit-age" placeholder="Years"></div>
+            <div><label>Gender</label><select id="fit-gender"><option value="male">Male</option><option value="female">Female</option></select></div>
+        </div>
+        <div class="grid">
+            <div class="input-box">
+                <label>Height</label>
+                <input type="number" id="fit-h-cm" placeholder="cm">
+                <div class="dual-input hidden" id="fit-h-ftin"><input type="number" id="fit-h-ft" placeholder="Ft"><input type="number" id="fit-h-in" placeholder="In"></div>
+                <select class="unit-sel" id="fit-h-unit" onchange="toggleHeight('fit')"><option value="cm">cm</option><option value="ft">ft+in</option></select>
+            </div>
+            <div class="input-box"><label>Weight</label><input type="number" id="fit-w"><select class="unit-sel" id="fit-w-unit"><option value="kg">kg</option><option value="lb">lb</option></select></div>
+        </div>
+        <div class="grid">
+            <div class="input-box"><label>Neck</label><input type="number" id="fit-neck"><select class="unit-sel" id="fit-n-unit"><option value="cm">cm</option><option value="in">in</option></select></div>
+            <div class="input-box"><label>Waist</label><input type="number" id="fit-waist"><select class="unit-sel" id="fit-wa-unit"><option value="cm">cm</option><option value="in">in</option></select></div>
+        </div>
+        <div class="grid">
+            <div class="input-box" style="grid-column: span 2;"><label>Hip (Required for WHR)</label><input type="number" id="fit-hip"><select class="unit-sel" id="fit-hi-unit"><option value="cm">cm</option><option value="in">in</option></select></div>
+        </div>
+        <button onclick="calculateFullFitness()">Run Fitness Pro Analysis</button>
+        <div id="fit-pro-res" class="results-container"></div>
+    </div>
+
+    <div class="disclaimer"><b>Disclaimer:</b> Educational purpose only. Anonymous data is recorded for research/study purposes.</div>
+</div>
+
+<!-- SEO Content Section for Search Engines -->
+<article class="seo-info-container">
+    <h2>About the Fitness & Body Composition Calculator</h2>
+    <p>This comprehensive health analysis tool created by <strong>Joash Sam</strong> evaluates essential body metrics including Body Mass Index (BMI), Body Fat Percentage, Waist-to-Hip Ratio (WHR), and Waist-to-Height Ratio (WHtR) to provide personalized fitness guidance.</p>
+    
+    <h2>Health Metrics Overview</h2>
+    <ul>
+        <li><strong>BMI (Body Mass Index):</strong> Measures relative body mass based on height and weight.</li>
+        <li><strong>Body Fat Percentage:</strong> Utilizes U.S. Navy tape measure formulas to estimate overall body fat vs. lean mass.</li>
+        <li><strong>Waist-to-Hip Ratio (WHR):</strong> Assesses central body fat accumulation and related metabolic risk factors.</li>
+        <li><strong>Waist-to-Height Ratio (WHtR):</strong> Monitors visceral abdominal fat proportions for cardiovascular health evaluation.</li>
+    </ul>
+</article>
+
+<script>
+    // YOUR LIVE GOOGLE SCRIPT URL
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxbCneZmL2GTLmj8QbbY4XabiSOQSLXL-EN_Bwx458D4cSA_-I0B1dze5srXSmeVs8t/exec";
+
+    function sendDataToGoogleSheet(payload) {
+        if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("YOUR_GOOGLE_APPS_SCRIPT_URL")) return;
+        
+        fetch(GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        }).catch(err => console.log("Data save failed silent", err));
+    }
+
+    function showTab(id) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+        document.getElementById(id).classList.add('active');
+    }
+
+    function toggleHeight(prefix) {
+        const unit = document.getElementById(`${prefix}-h-unit`).value;
+        const cmInput = document.getElementById(`${prefix}-h-cm`);
+        const ftinInput = document.getElementById(`${prefix}-h-ftin`);
+        if (unit === 'cm') { cmInput.classList.remove('hidden'); ftinInput.classList.add('hidden'); }
+        else { cmInput.classList.add('hidden'); ftinInput.classList.remove('hidden'); }
+    }
+
+    const toKg = (val, unit) => unit === 'lb' ? (val || 0) * 0.453592 : (val || 0);
+    const getCmValue = (prefix) => {
+        const unit = document.getElementById(`${prefix}-h-unit`).value;
+        if (unit === 'cm') return parseFloat(document.getElementById(`${prefix}-h-cm`).value) || 0;
+        return (parseFloat(document.getElementById(`${prefix}-h-ft`).value)||0)*30.48 + (parseFloat(document.getElementById(`${prefix}-h-in`).value)||0)*2.54;
+    };
+    const unitToCm = (val, unit) => unit === 'in' ? (val || 0) * 2.54 : (val || 0);
+
+    const Theme = {
+        green: { bg: 'var(--green-bg)', text: 'var(--green-text)', border: 'var(--green-border)' },
+        orange: { bg: 'var(--orange-bg)', text: 'var(--orange-text)', border: 'var(--orange-border)' },
+        red: { bg: 'var(--red-bg)', text: 'var(--red-text)', border: 'var(--red-border)' }
+    };
+
+    function renderCard(title, value, status, theme, normalRange, targetInfo, tip) {
+        return `
+        <div class="result-card" style="background:${theme.bg}; color:${theme.text}; border-color:${theme.border}">
+            <div class="res-top">
+                <div>
+                    <span class="status-badge" style="background:${theme.text}; color:#fff">${status}</span>
+                    <div class="res-label" style="margin-top: 4px;">${title}</div>
+                </div>
+                <div class="res-val">${value}</div>
+            </div>
+            <div class="res-target"><b>Normal Range:</b> ${normalRange}</div>
+            ${targetInfo ? `<div class="res-target"><b>Target Guidance:</b> ${targetInfo}</div>` : ''}
+            <div class="tip-box" style="border-color:${theme.text}">
+                <b>Tip:</b> ${tip}
+            </div>
+        </div>`;
+    }
+
+    function getBMIEvaluation(bmi, age) {
+        let min = 18.5, max = 24.9; 
+        if (age > 65) { min = 22; max = 27; }
+
+        if (bmi < min) {
+            return {
+                status: 'Underweight', theme: Theme.orange, range: `${min} – ${max}`,
+                tip: 'Your weight is low. Focus on a nutrient-dense caloric surplus and resistance training to build muscle.'
+            };
+        } else if (bmi <= max) {
+            return {
+                status: 'Healthy Weight', theme: Theme.green, range: `${min} – ${max}`,
+                tip: 'Your weight is optimal! Maintain this balance through regular physical activity and balanced nutrition.'
+            };
+        } else if (bmi <= 29.9) {
+            return {
+                status: 'Overweight', theme: Theme.orange, range: `${min} – ${max}`,
+                tip: 'Your weight is slightly higher than optimal. Consider a mild caloric deficit and regular exercise.'
+            };
+        } else {
+            return {
+                status: 'High Risk (Obese)', theme: Theme.red, range: `${min} – ${max}`,
+                tip: 'Your weight is significantly high. Consult a nutritionist or healthcare professional for a personalized fitness plan.'
+            };
+        }
+    }
+
+    function calculateOnlyBMI() {
+        const w = toKg(parseFloat(document.getElementById('bmi-w').value), document.getElementById('bmi-w-unit').value);
+        const h = getCmValue('bmi');
+        const age = parseInt(document.getElementById('bmi-age').value) || 0;
+        const g = document.getElementById('bmi-gender').value;
+        
+        if (!w || h < 50) return alert("Please fill in valid Weight and Height.");
+        
+        const bmi = (w / ((h/100)**2)).toFixed(1);
+        const evalBMI = getBMIEvaluation(bmi, age);
+
+        document.getElementById('bmi-only-res').innerHTML = renderCard('BMI Score', bmi, evalBMI.status, evalBMI.theme, evalBMI.range, null, evalBMI.tip);
+
+        // Send data to Google Sheet
+        sendDataToGoogleSheet({ age, gender: g, height: h.toFixed(1), weight: w.toFixed(1), bmi, bodyFat: "-", whr: "-", whtr: "-" });
+    }
+
+    function calculateFullFitness() {
+        const w = toKg(parseFloat(document.getElementById('fit-w').value), document.getElementById('fit-w-unit').value);
+        const h = getCmValue('fit');
+        const n = unitToCm(parseFloat(document.getElementById('fit-neck').value), document.getElementById('fit-n-unit').value);
+        const wa = unitToCm(parseFloat(document.getElementById('fit-waist').value), document.getElementById('fit-wa-unit').value);
+        const hi = unitToCm(parseFloat(document.getElementById('fit-hip').value), document.getElementById('fit-hi-unit').value);
+        const g = document.getElementById('fit-gender').value;
+        const age = parseInt(document.getElementById('fit-age').value) || 0;
+
+        if (!w || h < 50 || !wa || !n || !hi) return alert("Please fill all inputs.");
+
+        let html = '';
+        const bmi = (w / ((h/100)**2)).toFixed(1);
+        const evalBMI = getBMIEvaluation(bmi, age);
+        html += renderCard('BMI Score', bmi, evalBMI.status, evalBMI.theme, evalBMI.range, null, evalBMI.tip);
+
+        const bfatVal = (g === 'male') 
+            ? (495 / (1.0324 - 0.19077 * Math.log10(wa - n) + 0.15456 * Math.log10(h)) - 450)
+            : (495 / (1.29579 - 0.35004 * Math.log10(wa + hi - n) + 0.22100 * Math.log10(h)) - 450);
+        
+        const bfat = bfatVal.toFixed(1);
+        let bfatTheme = Theme.green, bfatStatus = 'Fit / Ideal', bfatRange = (g === 'male' ? '14% – 24%' : '21% – 31%'), bfatTip = '';
+
+        if (bfat < (g === 'male' ? 6 : 14)) {
+            bfatStatus = 'Low Fat'; bfatTheme = Theme.orange; bfatTip = 'Body fat is low. Maintain proper fat intake for optimal health.';
+        } else if (bfat <= (g === 'male' ? 24 : 31)) {
+            bfatStatus = 'Fit & Healthy'; bfatTheme = Theme.green; bfatTip = 'Great body composition! Maintain your current routine.';
+        } else {
+            bfatStatus = 'High Fat'; bfatTheme = Theme.red; bfatTip = 'Elevated body fat percentage. Focus on strength training and a moderate calorie deficit.';
+        }
+        html += renderCard('Body Fat Percentage', `${bfat}%`, bfatStatus, bfatTheme, bfatRange, null, bfatTip);
+
+        const whr = (wa / hi).toFixed(2);
+        const whrLimit = (g === 'male') ? 0.90 : 0.85;
+        const targetWaistFromHip = (hi * whrLimit).toFixed(1);
+        let whrTheme = (whr <= whrLimit) ? Theme.green : Theme.red;
+        let whrStatus = (whr <= whrLimit) ? 'Healthy Risk Level' : 'High Health Risk';
+        let whrTip = (whr <= whrLimit) ? 'Good fat distribution with low central fat accumulation.' : 'Higher visceral fat. Add aerobic conditioning and reduce processed intake.';
+        html += renderCard('Waist-to-Hip Ratio (WHR)', whr, whrStatus, whrTheme, `≤ ${whrLimit}`, `Ideal waist for current hip: ≤ ${targetWaistFromHip} cm`, whrTip);
+
+        const whtr = (wa / h).toFixed(2);
+        const targetWaistFromH = (h * 0.5).toFixed(1);
+        let whtrTheme = (whtr <= 0.50) ? Theme.green : Theme.red;
+        let whtrStatus = (whtr <= 0.50) ? 'Optimal Proportions' : 'Increased Risk';
+        let whtrTip = (whtr <= 0.50) ? 'Your waist size is safely under half your height.' : 'Waist is more than half your height. Focus on reducing waist circumference.';
+        html += renderCard('Waist-to-Height Ratio (WHtR)', whtr, whtrStatus, whtrTheme, '≤ 0.50', `Keep waist size under: ≤ ${targetWaistFromH} cm`, whtrTip);
+
+        document.getElementById('fit-pro-res').innerHTML = html;
+
+        // Send data to Google Sheet
+        sendDataToGoogleSheet({ age, gender: g, height: h.toFixed(1), weight: w.toFixed(1), bmi, bodyFat: bfat, whr, whtr });
+    }
+</script>
+</body>
+</html>
