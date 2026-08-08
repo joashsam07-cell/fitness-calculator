@@ -212,35 +212,51 @@
         </div>`;
     }
 
-    function getBMIEvaluation(bmi, age) {
+    function getBMIEvaluation(bmi, age, heightCm, weightUnit) {
         let min = 18.5, max = 24.9; 
         if (age > 65) { min = 22; max = 27; }
 
+        let targetInfo = null;
+        if (heightCm && heightCm >= 50) {
+            const hM = heightCm / 100;
+            const minKg = min * (hM * hM);
+            const maxKg = max * (hM * hM);
+            
+            if (weightUnit === 'lb') {
+                const minLb = (minKg / 0.453592).toFixed(1);
+                const maxLb = (maxKg / 0.453592).toFixed(1);
+                targetInfo = `Normal Weight: ${minLb} – ${maxLb} lb`;
+            } else {
+                targetInfo = `Normal Weight: ${minKg.toFixed(1)} – ${maxKg.toFixed(1)} kg`;
+            }
+        }
+
         if (bmi < min) {
             return {
-                status: 'Underweight', theme: Theme.orange, range: `${min} – ${max}`,
+                status: 'Underweight', theme: Theme.orange, range: `${min} – ${max}`, targetInfo,
                 tip: 'Your weight is low. Focus on a nutrient-dense caloric surplus and resistance training to build muscle.'
             };
         } else if (bmi <= max) {
             return {
-                status: 'Healthy Weight', theme: Theme.green, range: `${min} – ${max}`,
+                status: 'Healthy Weight', theme: Theme.green, range: `${min} – ${max}`, targetInfo,
                 tip: 'Your weight is optimal! Maintain this balance through regular physical activity and balanced nutrition.'
             };
         } else if (bmi <= 29.9) {
             return {
-                status: 'Overweight', theme: Theme.orange, range: `${min} – ${max}`,
+                status: 'Overweight', theme: Theme.orange, range: `${min} – ${max}`, targetInfo,
                 tip: 'Your weight is slightly higher than optimal. Consider a mild caloric deficit and regular exercise.'
             };
         } else {
             return {
-                status: 'High Risk (Obese)', theme: Theme.red, range: `${min} – ${max}`,
+                status: 'High Risk (Obese)', theme: Theme.red, range: `${min} – ${max}`, targetInfo,
                 tip: 'Your weight is significantly high. Consult a nutritionist or healthcare professional for a personalized fitness plan.'
             };
         }
     }
 
     function calculateOnlyBMI() {
-        const w = toKg(parseFloat(document.getElementById('bmi-w').value), document.getElementById('bmi-w-unit').value);
+        const wUnit = document.getElementById('bmi-w-unit').value;
+        const w = toKg(parseFloat(document.getElementById('bmi-w').value), wUnit);
         const h = getCmValue('bmi');
         const age = parseInt(document.getElementById('bmi-age').value) || 0;
         const g = document.getElementById('bmi-gender').value;
@@ -248,16 +264,17 @@
         if (!w || h < 50) return alert("Please fill in valid Weight and Height.");
         
         const bmi = (w / ((h/100)**2)).toFixed(1);
-        const evalBMI = getBMIEvaluation(bmi, age);
+        const evalBMI = getBMIEvaluation(bmi, age, h, wUnit);
 
-        document.getElementById('bmi-only-res').innerHTML = renderCard('BMI Score', bmi, evalBMI.status, evalBMI.theme, evalBMI.range, null, evalBMI.tip);
+        document.getElementById('bmi-only-res').innerHTML = renderCard('BMI Score', bmi, evalBMI.status, evalBMI.theme, evalBMI.range, evalBMI.targetInfo, evalBMI.tip);
 
         // Send data to Google Sheet
         sendDataToGoogleSheet({ age, gender: g, height: h.toFixed(1), weight: w.toFixed(1), bmi, bodyFat: "-", whr: "-", whtr: "-" });
     }
 
     function calculateFullFitness() {
-        const w = toKg(parseFloat(document.getElementById('fit-w').value), document.getElementById('fit-w-unit').value);
+        const wUnit = document.getElementById('fit-w-unit').value;
+        const w = toKg(parseFloat(document.getElementById('fit-w').value), wUnit);
         const h = getCmValue('fit');
         const n = unitToCm(parseFloat(document.getElementById('fit-neck').value), document.getElementById('fit-n-unit').value);
         const wa = unitToCm(parseFloat(document.getElementById('fit-waist').value), document.getElementById('fit-wa-unit').value);
@@ -269,8 +286,8 @@
 
         let html = '';
         const bmi = (w / ((h/100)**2)).toFixed(1);
-        const evalBMI = getBMIEvaluation(bmi, age);
-        html += renderCard('BMI Score', bmi, evalBMI.status, evalBMI.theme, evalBMI.range, null, evalBMI.tip);
+        const evalBMI = getBMIEvaluation(bmi, age, h, wUnit);
+        html += renderCard('BMI Score', bmi, evalBMI.status, evalBMI.theme, evalBMI.range, evalBMI.targetInfo, evalBMI.tip);
 
         const bfatVal = (g === 'male') 
             ? (495 / (1.0324 - 0.19077 * Math.log10(wa - n) + 0.15456 * Math.log10(h)) - 450)
