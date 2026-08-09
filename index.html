@@ -14,18 +14,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!-- SEO Meta Tags -->
-    <title>Fitness calculator by Joash Sam</title>
-    <meta name="title" content="Fitness calculator by Joash Sam">
-    <meta name="description" content="Fitness calculator by Joash Sam. Calculate your BMI, Body Fat Percentage, Waist-to-Hip Ratio (WHR), and Waist-to-Height Ratio (WHtR) with custom recommendations.">
-    <meta name="keywords" content="Fitness calculator by Joash Sam, fitness calculator, BMI calculator, body fat percentage calculator, waist to hip ratio, WHR, WHtR">
+    <!-- Primary SEO Meta Tags for Google Search -->
+    <title>Fitness & BMI Calculator Pro | Body Fat & Waist Ratios by Joash Sam</title>
+    <meta name="title" content="Fitness & BMI Calculator Pro | Body Fat & Waist Ratios by Joash Sam">
+    <meta name="description" content="Free online health and fitness calculator by Joash Sam. Instantly measure your BMI, Body Fat Percentage, Waist-to-Hip Ratio (WHR), and Waist-to-Height Ratio (WHtR) with custom recommendations.">
+    <meta name="keywords" content="fitness calculator, BMI calculator, body fat percentage calculator, waist to hip ratio, WHR, WHtR, health analytics, Joash Sam">
     <meta name="author" content="Joash Sam">
     <meta name="robots" content="index, follow">
 
-    <!-- Open Graph Meta Tags -->
+    <!-- Open Graph / WhatsApp Preview Meta Tags -->
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Fitness calculator by Joash Sam">
-    <meta property="og:description" content="Fitness calculator by Joash Sam. Calculate your BMI, Body Fat %, WHR, and WHtR instantly with tailored fitness feedback.">
+    <meta property="og:title" content="Fitness & BMI Calculator Pro by Joash Sam">
+    <meta property="og:description" content="Calculate your BMI, Body Fat %, WHR, and WHtR instantly. Get tailored fitness feedback and target ranges.">
+
+    <!-- html2pdf.js for 1-Click Client-Side PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
         :root { 
@@ -63,6 +66,9 @@
 
         button { width: 100%; padding: 16px; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 10px; font-size: 1rem; transition: background 0.2s; }
         button:hover { background: #1557b0; }
+        
+        .btn-pdf { background: #34a853; margin-top: 15px; }
+        .btn-pdf:hover { background: #2d8e47; }
 
         .results-container { margin-top: 25px; display: flex; flex-direction: column; gap: 15px; }
         .result-card { border-radius: 14px; padding: 16px; border: 1px solid; display: flex; flex-direction: column; gap: 8px; }
@@ -77,9 +83,32 @@
         
         .disclaimer { font-size: 0.7rem; color: #5f6368; line-height: 1.5; background: #f8f9fa; padding: 15px; border-radius: 12px; margin-top: 30px; border: 1px solid #dadce0; text-align: center; }
 
+        /* SEO Content Block for Google Bots */
         .seo-info-container { width: 100%; max-width: 520px; margin-top: 30px; font-size: 0.82rem; color: #5f6368; line-height: 1.6; }
         .seo-info-container h2 { font-size: 1.05rem; color: var(--navy); margin-top: 15px; margin-bottom: 5px; }
         .seo-info-container ul { padding-left: 18px; margin-top: 5px; }
+
+        /* Hidden PDF Container for html2pdf generation */
+        #pdf-template { display: none; font-family: 'Segoe UI', Arial, sans-serif; padding: 25px; color: #3c4043; background: #fff; width: 680px; }
+        .pdf-header { text-align: center; border-bottom: 2px solid #1a3c5e; padding-bottom: 12px; margin-bottom: 18px; }
+        .pdf-header h1 { color: #1a3c5e; margin: 0; font-size: 1.6rem; }
+        .pdf-header p { margin: 4px 0 0 0; font-size: 0.85rem; color: #5f6368; font-style: italic; }
+        
+        .pdf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #f8f9fa; padding: 12px; border-radius: 10px; font-size: 0.85rem; margin-bottom: 18px; border: 1px solid #dadce0; }
+        .pdf-grid-item { margin-bottom: 4px; }
+        .pdf-grid-item b { color: #1a3c5e; }
+
+        .pdf-section-title { font-size: 1.05rem; font-weight: bold; color: #1a3c5e; margin-bottom: 10px; border-left: 4px solid #1a73e8; padding-left: 8px; }
+        .pdf-metric-card { border: 1px solid #dadce0; border-radius: 8px; padding: 10px 14px; margin-bottom: 10px; font-size: 0.85rem; }
+        .pdf-metric-head { display: flex; justify-content: space-between; font-weight: bold; font-size: 0.95rem; margin-bottom: 4px; }
+        
+        .pdf-risk-box { text-align: center; padding: 14px; background: #f8f9fa; border: 2px dashed #1a73e8; border-radius: 10px; margin: 15px 0; }
+        .pdf-risk-title { font-size: 0.9rem; font-weight: bold; color: #5f6368; }
+        .pdf-risk-score { font-size: 2rem; font-weight: 800; color: #1a3c5e; margin: 4px 0; }
+        
+        .pdf-quote-box { background: #fff3e0; border-left: 4px solid #e65100; color: #e65100; padding: 10px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; margin-top: 10px; text-align: center; }
+        
+        .pdf-footer { text-align: center; font-size: 0.72rem; color: #70757a; border-top: 1px solid #dadce0; padding-top: 12px; margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -93,22 +122,22 @@
     </div>
 
     <div class="tabs">
-        <div class="tab active" onclick="showTab(event, 'bmi-sec')">BMI Check</div>
-        <div class="tab" onclick="showTab(event, 'fit-sec')">Fitness Pro</div>
+        <div class="tab active" onclick="showTab('bmi-sec')">BMI Check</div>
+        <div class="tab" onclick="showTab('fit-sec')">Fitness Pro</div>
     </div>
 
     <!-- BMI Section -->
     <div id="bmi-sec" class="section active">
         <div class="grid">
-            <div><label>Age</label><input type="number" id="bmi-age" min="1" max="120" placeholder="Years"></div>
+            <div><label>Age</label><input type="number" id="bmi-age" placeholder="Years"></div>
             <div><label>Gender</label><select id="bmi-gender"><option value="male">Male</option><option value="female">Female</option></select></div>
         </div>
         <div class="grid">
-            <div class="input-box"><label>Weight</label><input type="number" id="bmi-w" min="1"><select class="unit-sel" id="bmi-w-unit"><option value="kg">kg</option><option value="lb">lb</option></select></div>
+            <div class="input-box"><label>Weight</label><input type="number" id="bmi-w"><select class="unit-sel" id="bmi-w-unit"><option value="kg">kg</option><option value="lb">lb</option></select></div>
             <div class="input-box">
                 <label>Height</label>
-                <input type="number" id="bmi-h-cm" min="1" placeholder="cm">
-                <div class="dual-input hidden" id="bmi-h-ftin"><input type="number" id="bmi-h-ft" min="0" placeholder="Ft"><input type="number" id="bmi-h-in" min="0" max="11" placeholder="In"></div>
+                <input type="number" id="bmi-h-cm" placeholder="cm">
+                <div class="dual-input hidden" id="bmi-h-ftin"><input type="number" id="bmi-h-ft" placeholder="Ft"><input type="number" id="bmi-h-in" placeholder="In"></div>
                 <select class="unit-sel" id="bmi-h-unit" onchange="toggleHeight('bmi')"><option value="cm">cm</option><option value="ft">ft+in</option></select>
             </div>
         </div>
@@ -119,24 +148,24 @@
     <!-- Fitness Pro Section -->
     <div id="fit-sec" class="section">
         <div class="grid">
-            <div><label>Age</label><input type="number" id="fit-age" min="1" max="120" placeholder="Years"></div>
+            <div><label>Age</label><input type="number" id="fit-age" placeholder="Years"></div>
             <div><label>Gender</label><select id="fit-gender"><option value="male">Male</option><option value="female">Female</option></select></div>
         </div>
         <div class="grid">
             <div class="input-box">
                 <label>Height</label>
-                <input type="number" id="fit-h-cm" min="1" placeholder="cm">
-                <div class="dual-input hidden" id="fit-h-ftin"><input type="number" id="fit-h-ft" min="0" placeholder="Ft"><input type="number" id="fit-h-in" min="0" max="11" placeholder="In"></div>
+                <input type="number" id="fit-h-cm" placeholder="cm">
+                <div class="dual-input hidden" id="fit-h-ftin"><input type="number" id="fit-h-ft" placeholder="Ft"><input type="number" id="fit-h-in" placeholder="In"></div>
                 <select class="unit-sel" id="fit-h-unit" onchange="toggleHeight('fit')"><option value="cm">cm</option><option value="ft">ft+in</option></select>
             </div>
-            <div class="input-box"><label>Weight</label><input type="number" id="fit-w" min="1"><select class="unit-sel" id="fit-w-unit"><option value="kg">kg</option><option value="lb">lb</option></select></div>
+            <div class="input-box"><label>Weight</label><input type="number" id="fit-w"><select class="unit-sel" id="fit-w-unit"><option value="kg">kg</option><option value="lb">lb</option></select></div>
         </div>
         <div class="grid">
-            <div class="input-box"><label>Neck</label><input type="number" id="fit-neck" min="1"><select class="unit-sel" id="fit-n-unit"><option value="cm">cm</option><option value="in">in</option></select></div>
-            <div class="input-box"><label>Waist</label><input type="number" id="fit-waist" min="1"><select class="unit-sel" id="fit-wa-unit"><option value="cm">cm</option><option value="in">in</option></select></div>
+            <div class="input-box"><label>Neck</label><input type="number" id="fit-neck"><select class="unit-sel" id="fit-n-unit"><option value="cm">cm</option><option value="in">in</option></select></div>
+            <div class="input-box"><label>Waist</label><input type="number" id="fit-waist"><select class="unit-sel" id="fit-wa-unit"><option value="cm">cm</option><option value="in">in</option></select></div>
         </div>
         <div class="grid">
-            <div class="input-box" style="grid-column: span 2;"><label>Hip (Required for WHR & Body Fat)</label><input type="number" id="fit-hip" min="1"><select class="unit-sel" id="fit-hi-unit"><option value="cm">cm</option><option value="in">in</option></select></div>
+            <div class="input-box" style="grid-column: span 2;"><label>Hip (Required for WHR)</label><input type="number" id="fit-hip"><select class="unit-sel" id="fit-hi-unit"><option value="cm">cm</option><option value="in">in</option></select></div>
         </div>
         <button onclick="calculateFullFitness()">Run Fitness Pro Analysis</button>
         <div id="fit-pro-res" class="results-container"></div>
@@ -145,9 +174,10 @@
     <div class="disclaimer"><b>Disclaimer:</b> Educational purpose only. Anonymous data is recorded for research/study purposes.</div>
 </div>
 
+<!-- SEO Content Section for Search Engines -->
 <article class="seo-info-container">
-    <h2>About Fitness calculator by Joash Sam</h2>
-    <p> Fitness calculator by Joash Sam evaluates essential body metrics including Body Mass Index (BMI), Body Fat Percentage, Waist-to-Hip Ratio (WHR), and Waist-to-Height Ratio (WHtR) to provide personalized fitness guidance.</p>
+    <h2>About the Fitness & Body Composition Calculator</h2>
+    <p>This comprehensive health analysis tool evaluates essential body metrics including Body Mass Index (BMI), Body Fat Percentage, Waist-to-Hip Ratio (WHR), and Waist-to-Height Ratio (WHtR) to provide personalized fitness guidance.</p>
     
     <h2>Health Metrics Overview</h2>
     <ul>
@@ -158,8 +188,38 @@
     </ul>
 </article>
 
+<!-- Hidden PDF Template for Export -->
+<div id="pdf-template">
+    <div class="pdf-header">
+        <h1>Fitness & Health Analysis Report</h1>
+        <p>Research & Academic Health Analytics by Joash Sam</p>
+    </div>
+
+    <div class="pdf-grid" id="pdf-user-info"></div>
+
+    <div class="pdf-section-title">Body Composition & Health Metrics</div>
+    <div id="pdf-metrics-list"></div>
+
+    <div class="pdf-risk-box">
+        <div class="pdf-risk-title">Estimated Combined Cardiometabolic Health Risk</div>
+        <div class="pdf-risk-score" id="pdf-risk-val">0%</div>
+        <div style="font-size: 0.75rem; color: #70757a;" id="pdf-risk-desc">Based on cumulative deviation from ideal BMI, WHR, and WHtR boundaries.</div>
+    </div>
+
+    <div id="pdf-quote-container"></div>
+
+    <div class="pdf-footer">
+        <b>Fitness & BMI Calculator Pro</b> | Developed by Joash Sam<br>
+        Web App: https://joashsam07-cell.github.io/fitness-calculator/<br>
+        <i>This report is intended for educational and fitness tracking purposes only.</i>
+    </div>
+</div>
+
 <script>
+    // YOUR LIVE GOOGLE SCRIPT URL
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxbCneZmL2GTLmj8QbbY4XabiSOQSLXL-EN_Bwx458D4cSA_-I0B1dze5srXSmeVs8t/exec";
+
+    let currentReportData = null;
 
     function sendDataToGoogleSheet(payload) {
         if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("YOUR_GOOGLE_APPS_SCRIPT_URL")) return;
@@ -172,10 +232,10 @@
         }).catch(err => console.log("Data save failed silent", err));
     }
 
-    function showTab(evt, id) {
+    function showTab(id) {
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-        evt.currentTarget.classList.add('active');
+        event.currentTarget.classList.add('active');
         document.getElementById(id).classList.add('active');
     }
 
@@ -263,50 +323,56 @@
 
     function calculateOnlyBMI() {
         const wUnit = document.getElementById('bmi-w-unit').value;
-        const w = toKg(parseFloat(document.getElementById('bmi-w').value), wUnit);
+        const rawW = parseFloat(document.getElementById('bmi-w').value) || 0;
+        const w = toKg(rawW, wUnit);
         const h = getCmValue('bmi');
         const age = parseInt(document.getElementById('bmi-age').value) || 0;
         const g = document.getElementById('bmi-gender').value;
         
-        if (!w || w <= 0 || h < 50) return alert("Please fill in valid positive values for Weight and Height.");
+        if (!w || h < 50) return alert("Please fill in valid Weight and Height.");
         
         const bmi = (w / ((h/100)**2)).toFixed(1);
-        const evalBMI = getBMIEvaluation(parseFloat(bmi), age, h, wUnit);
+        const evalBMI = getBMIEvaluation(bmi, age, h, wUnit);
 
-        document.getElementById('bmi-only-res').innerHTML = renderCard('BMI Score', bmi, evalBMI.status, evalBMI.theme, evalBMI.range, evalBMI.targetInfo, evalBMI.tip);
+        let html = renderCard('BMI Score', bmi, evalBMI.status, evalBMI.theme, evalBMI.range, evalBMI.targetInfo, evalBMI.tip);
+        html += `<button class="btn-pdf" onclick="promptAndGeneratePDF()">📄 Download My Health Summary (PDF)</button>`;
 
+        document.getElementById('bmi-only-res').innerHTML = html;
+
+        currentReportData = {
+            type: 'BMI Only', age, gender: g, weight: `${rawW} ${wUnit}`, height: `${h.toFixed(1)} cm`,
+            neck: '-', waist: '-', hip: '-', bmi, evalBMI,
+            bodyFat: null, whr: null, whtr: null
+        };
+
+        // Send data to Google Sheet
         sendDataToGoogleSheet({ age, gender: g, height: h.toFixed(1), weight: w.toFixed(1), bmi, bodyFat: "-", whr: "-", whtr: "-" });
     }
 
     function calculateFullFitness() {
         const wUnit = document.getElementById('fit-w-unit').value;
-        const w = toKg(parseFloat(document.getElementById('fit-w').value), wUnit);
+        const rawW = parseFloat(document.getElementById('fit-w').value) || 0;
+        const w = toKg(rawW, wUnit);
         const h = getCmValue('fit');
-        const n = unitToCm(parseFloat(document.getElementById('fit-neck').value), document.getElementById('fit-n-unit').value);
-        const wa = unitToCm(parseFloat(document.getElementById('fit-waist').value), document.getElementById('fit-wa-unit').value);
-        const hi = unitToCm(parseFloat(document.getElementById('fit-hip').value), document.getElementById('fit-hi-unit').value);
+        const rawN = parseFloat(document.getElementById('fit-neck').value) || 0;
+        const n = unitToCm(rawN, document.getElementById('fit-n-unit').value);
+        const rawWa = parseFloat(document.getElementById('fit-waist').value) || 0;
+        const wa = unitToCm(rawWa, document.getElementById('fit-wa-unit').value);
+        const rawHi = parseFloat(document.getElementById('fit-hip').value) || 0;
+        const hi = unitToCm(rawHi, document.getElementById('fit-hi-unit').value);
         const g = document.getElementById('fit-gender').value;
         const age = parseInt(document.getElementById('fit-age').value) || 0;
 
-        if (!w || w <= 0 || h < 50 || !wa || wa <= 0 || !n || n <= 0 || !hi || hi <= 0) {
-            return alert("Please fill all inputs with valid positive measurements.");
-        }
-
-        if (g === 'male' && wa <= n) {
-            return alert("Waist circumference must be greater than neck circumference.");
-        }
-        if (g === 'female' && (wa + hi) <= n) {
-            return alert("Combined Waist and Hip circumference must be greater than neck circumference.");
-        }
+        if (!w || h < 50 || !wa || !n || !hi) return alert("Please fill all inputs.");
 
         let html = '';
         const bmi = (w / ((h/100)**2)).toFixed(1);
-        const evalBMI = getBMIEvaluation(parseFloat(bmi), age, h, wUnit);
+        const evalBMI = getBMIEvaluation(bmi, age, h, wUnit);
         html += renderCard('BMI Score', bmi, evalBMI.status, evalBMI.theme, evalBMI.range, evalBMI.targetInfo, evalBMI.tip);
 
         const bfatVal = (g === 'male') 
-            ? (495 / (1.0324 - 0.19077 * Math.log10(Math.max(1, wa - n)) + 0.15456 * Math.log10(h)) - 450)
-            : (495 / (1.29579 - 0.35004 * Math.log10(Math.max(1, wa + hi - n)) + 0.22100 * Math.log10(h)) - 450);
+            ? (495 / (1.0324 - 0.19077 * Math.log10(wa - n) + 0.15456 * Math.log10(h)) - 450)
+            : (495 / (1.29579 - 0.35004 * Math.log10(wa + hi - n) + 0.22100 * Math.log10(h)) - 450);
         
         const bfat = bfatVal.toFixed(1);
         let bfatTheme = Theme.green, bfatStatus = 'Fit / Ideal', bfatRange = (g === 'male' ? '14% – 24%' : '21% – 31%'), bfatTip = '';
@@ -335,9 +401,151 @@
         let whtrTip = (whtr <= 0.50) ? 'Your waist size is safely under half your height.' : 'Waist is more than half your height. Focus on reducing waist circumference.';
         html += renderCard('Waist-to-Height Ratio (WHtR)', whtr, whtrStatus, whtrTheme, '≤ 0.50', `Keep waist size under: ≤ ${targetWaistFromH} cm`, whtrTip);
 
+        html += `<button class="btn-pdf" onclick="promptAndGeneratePDF()">📄 Download My Health Summary (PDF)</button>`;
+
         document.getElementById('fit-pro-res').innerHTML = html;
 
+        currentReportData = {
+            type: 'Full Fitness Pro', age, gender: g, weight: `${rawW} ${wUnit}`, height: `${h.toFixed(1)} cm`,
+            neck: `${rawN} ${document.getElementById('fit-n-unit').value}`,
+            waist: `${rawWa} ${document.getElementById('fit-wa-unit').value}`,
+            hip: `${rawHi} ${document.getElementById('fit-hi-unit').value}`,
+            bmi, evalBMI,
+            bodyFat: { val: `${bfat}%`, status: bfatStatus, range: bfatRange, tip: bfatTip },
+            whr: { val: whr, status: whrStatus, range: `≤ ${whrLimit}`, tip: whrTip },
+            whtr: { val: whtr, status: whtrStatus, range: '≤ 0.50', tip: whtrTip }
+        };
+
+        // Send data to Google Sheet
         sendDataToGoogleSheet({ age, gender: g, height: h.toFixed(1), weight: w.toFixed(1), bmi, bodyFat: bfat, whr, whtr });
+    }
+
+    function promptAndGeneratePDF() {
+        if (!currentReportData) return alert("Please calculate your metrics first!");
+
+        const userName = prompt("Enter the name you want to appear on your report:", "Valued User");
+        if (userName === null) return; // User cancelled prompt
+
+        const finalName = userName.trim() !== "" ? userName.trim() : "Valued User";
+        generatePDFReport(finalName);
+    }
+
+    function generatePDFReport(userName) {
+        const d = currentReportData;
+        const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+        // Build User Info Grid
+        let userInfoHTML = `
+            <div class="pdf-grid-item"><b>Report For:</b> ${userName}</div>
+            <div class="pdf-grid-item"><b>Date:</b> ${today}</div>
+            <div class="pdf-grid-item"><b>Age:</b> ${d.age || 'N/A'} yrs</div>
+            <div class="pdf-grid-item"><b>Gender:</b> ${d.gender.toUpperCase()}</div>
+            <div class="pdf-grid-item"><b>Weight:</b> ${d.weight}</div>
+            <div class="pdf-grid-item"><b>Height:</b> ${d.height}</div>
+            <div class="pdf-grid-item"><b>Waist:</b> ${d.waist}</div>
+            <div class="pdf-grid-item"><b>Hip:</b> ${d.hip}</div>
+        `;
+        if (d.gender.toLowerCase() === 'female') {
+            userInfoHTML += `<div class="pdf-grid-item"><b>Neck:</b> ${d.neck}</div>`;
+        }
+        document.getElementById('pdf-user-info').innerHTML = userInfoHTML;
+
+        // Build Metrics List & Compute Health Risk Score
+        let metricsHTML = '';
+        let riskScore = 10; // Baseline risk score
+
+        // 1. BMI Metric
+        if (parseFloat(d.bmi) >= 25) riskScore += 25;
+        if (parseFloat(d.bmi) >= 30) riskScore += 20;
+        metricsHTML += `
+            <div class="pdf-metric-card">
+                <div class="pdf-metric-head">
+                    <span>BMI (Body Mass Index): ${d.bmi}</span>
+                    <span>${d.evalBMI.status}</span>
+                </div>
+                <div><b>Normal Range:</b> ${d.evalBMI.range}</div>
+                <div><b>Tip:</b> ${d.evalBMI.tip}</div>
+            </div>`;
+
+        // 2. Body Fat %
+        if (d.bodyFat) {
+            if (d.bodyFat.status === 'High Fat') riskScore += 20;
+            metricsHTML += `
+                <div class="pdf-metric-card">
+                    <div class="pdf-metric-head">
+                        <span>Body Fat Percentage: ${d.bodyFat.val}</span>
+                        <span>${d.bodyFat.status}</span>
+                    </div>
+                    <div><b>Normal Range:</b> ${d.bodyFat.range}</div>
+                    <div><b>Tip:</b> ${d.bodyFat.tip}</div>
+                </div>`;
+        }
+
+        // 3. WHR
+        if (d.whr) {
+            if (d.whr.status === 'High Health Risk') riskScore += 15;
+            metricsHTML += `
+                <div class="pdf-metric-card">
+                    <div class="pdf-metric-head">
+                        <span>Waist-to-Hip Ratio (WHR): ${d.whr.val}</span>
+                        <span>${d.whr.status}</span>
+                    </div>
+                    <div><b>Target Range:</b> ${d.whr.range}</div>
+                    <div><b>Tip:</b> ${d.whr.tip}</div>
+                </div>`;
+        }
+
+        // 4. WHtR
+        if (d.whtr) {
+            if (d.whtr.status === 'Increased Risk') riskScore += 15;
+            metricsHTML += `
+                <div class="pdf-metric-card">
+                    <div class="pdf-metric-head">
+                        <span>Waist-to-Height Ratio (WHtR): ${d.whtr.val}</span>
+                        <span>${d.whtr.status}</span>
+                    </div>
+                    <div><b>Target Range:</b> ${d.whtr.range}</div>
+                    <div><b>Tip:</b> ${d.whtr.tip}</div>
+                </div>`;
+        }
+
+        document.getElementById('pdf-metrics-list').innerHTML = metricsHTML;
+
+        // Cap Risk Score between 12% and 95%
+        const finalRisk = Math.min(Math.max(riskScore, 12), 95);
+        document.getElementById('pdf-risk-val').innerText = `${finalRisk}%`;
+
+        // Add Motivational Quote if elevated weight/risk detected
+        const isElevated = (parseFloat(d.bmi) >= 25) || (d.bodyFat && d.bodyFat.status === 'High Fat') || (d.whtr && d.whtr.status === 'Increased Risk');
+        const quoteContainer = document.getElementById('pdf-quote-container');
+        
+        if (isElevated) {
+            quoteContainer.innerHTML = `
+                <div class="pdf-quote-box">
+                    💡 "It's never too late to start your fitness journey! Small daily habits lead to major long-term health transformation."
+                </div>`;
+        } else {
+            quoteContainer.innerHTML = `
+                <div class="pdf-quote-box" style="background:#e8f5e9; border-color:#2e7d32; color:#2e7d32;">
+                    🌟 "Outstanding effort! Keep maintaining your healthy lifestyle and balanced nutrition routines."
+                </div>`;
+        }
+
+        // Generate PDF using html2pdf.js
+        const element = document.getElementById('pdf-template');
+        element.style.display = 'block';
+
+        const opt = {
+            margin:       10,
+            filename:     `Fitness_Report_${userName.replace(/[^a-z0-9]/gi, '_')}.pdf`,
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2 },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        html2pdf().set(opt).from(element).save().then(() => {
+            element.style.display = 'none';
+        });
     }
 </script>
 </body>
