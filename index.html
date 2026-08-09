@@ -58,6 +58,7 @@
             max-width: 520px; 
             box-sizing: border-box; 
             border: 1px solid rgba(255, 255, 255, 0.8);
+            position: relative;
         }
         
         .brand-header { margin-bottom: 25px; }
@@ -70,40 +71,70 @@
         .tab { flex: 1; text-align: center; padding: 12px 5px; cursor: pointer; border-radius: 10px; font-weight: 700; color: #4a5568; transition: all 0.25s ease; font-size: 0.85rem; }
         .tab.active { background: var(--primary); color: white; box-shadow: 0 4px 14px rgba(26,115,232,0.3); }
         
-        /* Floating Pointer Badge */
+        /* Floating Pointer Badge - Right Side */
         .fit-pro-pointer {
             position: absolute;
-            right: 0px;
-            top: -26px;
-            background: #ff6b6b;
+            right: -130px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #ff4757;
             color: #ffffff;
-            font-size: 0.68rem;
+            font-size: 0.78rem;
             font-weight: 800;
-            padding: 4px 10px;
+            padding: 7px 12px;
             border-radius: 20px;
-            box-shadow: 0 4px 10px rgba(255, 107, 107, 0.35);
+            box-shadow: 0 4px 12px rgba(255, 71, 87, 0.4);
             display: flex;
             align-items: center;
-            gap: 4px;
-            animation: bouncePoint 1.6s infinite ease-in-out;
+            gap: 5px;
+            animation: nudgeLeft 1.4s infinite ease-in-out;
             cursor: pointer;
             z-index: 10;
-        }
-        .fit-pro-pointer::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            right: 25px;
-            width: 0;
-            height: 0;
-            border-left: 5px solid transparent;
-            border-right: 5px solid transparent;
-            border-top: 6px solid #ff6b6b;
+            white-space: nowrap;
         }
 
-        @keyframes bouncePoint {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
+        .fit-pro-pointer::before {
+            content: '';
+            position: absolute;
+            left: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
+            border-right: 7px solid #ff4757;
+        }
+
+        @keyframes nudgeLeft {
+            0%, 100% { transform: translateY(-50%) translateX(0); }
+            50% { transform: translateY(-50%) translateX(-6px); }
+        }
+
+        /* Responsive handling for smaller mobile screens */
+        @media (max-width: 680px) {
+            .fit-pro-pointer {
+                right: 10px;
+                top: -30px;
+                transform: none;
+                animation: bouncePoint 1.6s infinite ease-in-out;
+            }
+            .fit-pro-pointer::before { display: none; }
+            .fit-pro-pointer::after {
+                content: '';
+                position: absolute;
+                bottom: -5px;
+                right: 25px;
+                width: 0;
+                height: 0;
+                border-left: 5px solid transparent;
+                border-right: 5px solid transparent;
+                border-top: 6px solid #ff4757;
+            }
+            @keyframes bouncePoint {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-5px); }
+            }
         }
 
         .section { display: none; }
@@ -180,9 +211,9 @@
     </div>
 
     <div class="tabs-container">
-        <!-- Floating Pointer to encourage clicking Fitness Pro -->
+        <!-- Right-aligned Floating Pointer -->
         <div id="fit-pointer" class="fit-pro-pointer" onclick="switchTabToFitPro()">
-            <span>👉</span> Get Body Fat %
+            👈 Get Body Fat %
         </div>
 
         <div class="tabs">
