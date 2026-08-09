@@ -25,58 +25,148 @@
     <style>
         :root { 
             --primary: #1a73e8; 
-            --bg: #f8f9fa; 
+            --primary-hover: #1557b0;
+            --bg-start: #eef2f7; 
+            --bg-end: #d9e2ec;
             --card: #ffffff;
+            --navy: #1a3c5e; 
+            
             --green-bg: #e8f5e9; --green-text: #2e7d32; --green-border: #a5d6a7;
             --orange-bg: #fff3e0; --orange-text: #e65100; --orange-border: #ffcc80;
             --red-bg: #ffebee; --red-text: #c62828; --red-border: #ef9a9a;
-            --navy: #1a3c5e; 
         }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); display: flex; flex-direction: column; align-items: center; padding: 20px; color: #3c4043; min-height: 100vh; margin: 0; box-sizing: border-box; }
-        .card { background: var(--card); padding: 2rem; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.06); width: 100%; max-width: 520px; box-sizing: border-box; }
+
+        body { 
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 30px 20px; 
+            color: #2c3e50; 
+            min-height: 100vh; 
+            margin: 0; 
+            box-sizing: border-box; 
+        }
+
+        .card { 
+            background: var(--card); 
+            padding: 2.2rem; 
+            border-radius: 28px; 
+            box-shadow: 0 15px 35px rgba(26, 60, 94, 0.08), 0 5px 15px rgba(0,0,0,0.04); 
+            width: 100%; 
+            max-width: 520px; 
+            box-sizing: border-box; 
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
         
         .brand-header { margin-bottom: 25px; }
-        .brand-text h1 { font-size: 1.8rem; color: var(--navy); margin: 0; line-height: 1.1; font-weight: 800; text-align: center; }
+        .brand-text h1 { font-size: 1.85rem; color: var(--navy); margin: 0; line-height: 1.1; font-weight: 800; text-align: center; letter-spacing: -0.5px; }
         .brand-text p { font-size: 0.82rem; color: #5f6368; margin: 6px 12px 0 0; font-weight: 600; letter-spacing: 0.5px; text-align: right; font-style: italic; opacity: 0.85; }
 
-        .tabs { display: flex; background: #f1f3f4; border-radius: 12px; padding: 4px; margin-bottom: 25px; }
-        .tab { flex: 1; text-align: center; padding: 12px 5px; cursor: pointer; border-radius: 10px; font-weight: 700; color: #5f6368; transition: 0.3s; font-size: 0.85rem; }
-        .tab.active { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(26,115,232,0.2); }
+        .tabs-container { position: relative; margin-bottom: 25px; }
+
+        .tabs { display: flex; background: #e2e8f0; border-radius: 14px; padding: 4px; }
+        .tab { flex: 1; text-align: center; padding: 12px 5px; cursor: pointer; border-radius: 10px; font-weight: 700; color: #4a5568; transition: all 0.25s ease; font-size: 0.85rem; }
+        .tab.active { background: var(--primary); color: white; box-shadow: 0 4px 14px rgba(26,115,232,0.3); }
         
+        /* Floating Pointer Badge */
+        .fit-pro-pointer {
+            position: absolute;
+            right: 0px;
+            top: -26px;
+            background: #ff6b6b;
+            color: #ffffff;
+            font-size: 0.68rem;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 20px;
+            box-shadow: 0 4px 10px rgba(255, 107, 107, 0.35);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            animation: bouncePoint 1.6s infinite ease-in-out;
+            cursor: pointer;
+            z-index: 10;
+        }
+        .fit-pro-pointer::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            right: 25px;
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 6px solid #ff6b6b;
+        }
+
+        @keyframes bouncePoint {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
         .section { display: none; }
         .section.active { display: block; }
         
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
         .input-box { position: relative; }
-        label { display: block; font-size: 0.75rem; font-weight: 700; color: #70757a; margin-bottom: 6px; text-transform: uppercase; }
-        input, select { width: 100%; padding: 12px; border: 1.5px solid #dadce0; border-radius: 10px; box-sizing: border-box; font-size: 0.95rem; outline: none; }
+        label { display: block; font-size: 0.75rem; font-weight: 700; color: #4a5568; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.3px; }
+        input, select { 
+            width: 100%; 
+            padding: 12px; 
+            border: 1.5px solid #cbd5e0; 
+            border-radius: 12px; 
+            box-sizing: border-box; 
+            font-size: 0.95rem; 
+            outline: none; 
+            transition: all 0.2s;
+            background: #f8fafc;
+        }
+        input:focus, select:focus {
+            border-color: var(--primary);
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.15);
+        }
         
-        .unit-sel { position: absolute; right: 8px; top: 32px; font-size: 0.7rem; border: none; background: #f1f3f4; padding: 4px 6px; border-radius: 6px; width: auto; color: var(--primary); font-weight: bold; cursor: pointer; }
+        .unit-sel { position: absolute; right: 8px; top: 32px; font-size: 0.7rem; border: none; background: #e2e8f0; padding: 4px 6px; border-radius: 6px; width: auto; color: var(--primary); font-weight: bold; cursor: pointer; }
         .dual-input { display: flex; gap: 5px; }
         .hidden { display: none; }
 
-        button { width: 100%; padding: 16px; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 10px; font-size: 1rem; transition: background 0.2s; }
-        button:hover { background: #1557b0; }
+        button { 
+            width: 100%; 
+            padding: 16px; 
+            background: var(--primary); 
+            color: white; 
+            border: none; 
+            border-radius: 12px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            margin-top: 10px; 
+            font-size: 1rem; 
+            transition: all 0.2s; 
+            box-shadow: 0 4px 12px rgba(26, 115, 232, 0.25);
+        }
+        button:hover { background: var(--primary-hover); transform: translateY(-1px); }
         
-        .btn-pdf { background: #34a853; margin-top: 15px; }
-        .btn-pdf:hover { background: #2d8e47; }
+        .btn-pdf { background: #2e7d32; box-shadow: 0 4px 12px rgba(46, 125, 50, 0.25); margin-top: 15px; }
+        .btn-pdf:hover { background: #256629; }
 
         .results-container { margin-top: 25px; display: flex; flex-direction: column; gap: 15px; }
-        .result-card { border-radius: 14px; padding: 16px; border: 1px solid; display: flex; flex-direction: column; gap: 8px; }
+        .result-card { border-radius: 16px; padding: 18px; border: 1px solid; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
         .res-top { display: flex; justify-content: space-between; align-items: center; }
         .res-label { font-weight: 700; font-size: 0.95rem; }
-        .res-val { font-weight: 800; font-size: 1.3rem; }
+        .res-val { font-weight: 800; font-size: 1.35rem; }
         
         .status-badge { font-size: 0.65rem; font-weight: 800; padding: 4px 8px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .res-target { font-size: 0.75rem; font-weight: 600; opacity: 0.85; margin-top: 2px; }
+        .res-target { font-size: 0.75rem; font-weight: 600; opacity: 0.88; margin-top: 2px; }
         
-        .tip-box { background: rgba(255, 255, 255, 0.6); padding: 10px 12px; border-radius: 8px; font-size: 0.8rem; line-height: 1.45; font-weight: 500; border-left: 3px solid; margin-top: 4px; }
+        .tip-box { background: rgba(255, 255, 255, 0.75); padding: 10px 12px; border-radius: 8px; font-size: 0.8rem; line-height: 1.45; font-weight: 500; border-left: 3px solid; margin-top: 4px; }
         
-        .disclaimer { font-size: 0.7rem; color: #5f6368; line-height: 1.5; background: #f8f9fa; padding: 15px; border-radius: 12px; margin-top: 30px; border: 1px solid #dadce0; text-align: center; }
+        .disclaimer { font-size: 0.7rem; color: #5f6368; line-height: 1.5; background: rgba(255, 255, 255, 0.6); padding: 15px; border-radius: 14px; margin-top: 30px; border: 1px solid #cbd5e0; text-align: center; }
 
-        .seo-info-container { width: 100%; max-width: 520px; margin-top: 30px; font-size: 0.82rem; color: #5f6368; line-height: 1.6; }
+        .seo-info-container { width: 100%; max-width: 520px; margin-top: 30px; font-size: 0.82rem; color: #4a5568; line-height: 1.6; }
         .seo-info-container h2 { font-size: 1.05rem; color: var(--navy); margin-top: 15px; margin-bottom: 5px; }
-        .seo-info-container ul { padding-left: 18px; margin-top: 5px; }
     </style>
 </head>
 <body>
@@ -89,9 +179,16 @@
         </div>
     </div>
 
-    <div class="tabs">
-        <div class="tab active" onclick="showTab('bmi-sec', event)">BMI Check</div>
-        <div class="tab" onclick="showTab('fit-sec', event)">Fitness Pro</div>
+    <div class="tabs-container">
+        <!-- Floating Pointer to encourage clicking Fitness Pro -->
+        <div id="fit-pointer" class="fit-pro-pointer" onclick="switchTabToFitPro()">
+            <span>👉</span> Get Body Fat %
+        </div>
+
+        <div class="tabs">
+            <div id="tab-bmi" class="tab active" onclick="showTab('bmi-sec', event)">BMI Check</div>
+            <div id="tab-fit" class="tab" onclick="showTab('fit-sec', event)">Fitness Pro</div>
+        </div>
     </div>
 
     <!-- BMI Section -->
@@ -167,6 +264,19 @@
         document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
         evt.currentTarget.classList.add('active');
         document.getElementById(id).classList.add('active');
+
+        // Hide floating pointer when Fitness Pro tab is activated
+        const pointer = document.getElementById('fit-pointer');
+        if (id === 'fit-sec') {
+            pointer.style.display = 'none';
+        } else {
+            pointer.style.display = 'flex';
+        }
+    }
+
+    function switchTabToFitPro() {
+        const fitTab = document.getElementById('tab-fit');
+        fitTab.click();
     }
 
     function toggleHeight(prefix) {
@@ -186,9 +296,9 @@
     const unitToCm = (val, unit) => unit === 'in' ? (val || 0) * 2.54 : (val || 0);
 
     const Theme = {
-        green: { bg: 'var(--green-bg)', text: 'var(--green-text)', border: 'var(--green-border)' },
-        orange: { bg: 'var(--orange-bg)', text: 'var(--orange-text)', border: 'var(--orange-border)' },
-        red: { bg: 'var(--red-bg)', text: 'var(--red-text)', border: 'var(--red-border)' }
+        green: { bg: 'var(--green-bg)', text: 'var(--green-text)', border: 'var(--green-border)', rgb: [46, 125, 50] },
+        orange: { bg: 'var(--orange-bg)', text: 'var(--orange-text)', border: 'var(--orange-border)', rgb: [230, 81, 0] },
+        red: { bg: 'var(--red-bg)', text: 'var(--red-text)', border: 'var(--red-border)', rgb: [198, 40, 40] }
     };
 
     function renderCard(title, value, status, theme, normalRange, targetInfo, tip) {
@@ -237,7 +347,6 @@
         }
     }
 
-    // Comprehensive Risk Assessment Matrix based on BMI & Body Shape (WHR/WHtR)
     function evaluateMetabolicRisk(bmiCategory, isAndroid) {
         if (bmiCategory === 'normal' || bmiCategory === 'underweight') {
             if (isAndroid) {
@@ -334,14 +443,11 @@
         let whtrTip = (whtr <= 0.50) ? 'Your waist size is safely under half your height.' : 'Waist is more than half your height. Focus on reducing waist circumference.';
         html += renderCard('Waist-to-Height Ratio (WHtR)', whtr, whtrStatus, whtrTheme, '≤ 0.50', `Keep waist size under: ≤ ${targetWaistFromH} cm`, whtrTip);
 
-        // Detect Android Shape (elevated central waist ratios)
         const isAndroid = (whr > whrLimit) || (whtr > 0.50);
         const riskEval = evaluateMetabolicRisk(evalBMI.rawCategory, isAndroid);
 
-        // Render Summary Card for Metabolic / CV Risk
         html += renderCard('Metabolic or Cardiovascular Disease Risk', riskEval.level, `${riskEval.level} Risk`, riskEval.theme, null, null, riskEval.tip);
 
-        // PDF Download button for Fitness Pro
         html += `<button class="btn-pdf" onclick="promptAndGeneratePDF()">📄 Download PDF Summary</button>`;
 
         document.getElementById('fit-pro-res').innerHTML = html;
@@ -352,9 +458,9 @@
             waist: `${rawWa} ${document.getElementById('fit-wa-unit').value}`,
             hip: `${rawHi} ${document.getElementById('fit-hi-unit').value}`,
             bmi, evalBMI,
-            bodyFat: { val: `${bfat}%`, status: bfatStatus, range: bfatRange, tip: bfatTip },
-            whr: { val: whr, status: whrStatus, range: `≤ ${whrLimit}`, tip: whrTip },
-            whtr: { val: whtr, status: whtrStatus, range: '≤ 0.50', tip: whtrTip },
+            bodyFat: { val: `${bfat}%`, status: bfatStatus, range: bfatRange, tip: bfatTip, theme: bfatTheme },
+            whr: { val: whr, status: whrStatus, range: `≤ ${whrLimit}`, tip: whrTip, theme: whrTheme },
+            whtr: { val: whtr, status: whtrStatus, range: '≤ 0.50', tip: whtrTip, theme: whtrTheme },
             metabolicRisk: riskEval
         };
 
@@ -368,18 +474,25 @@
         generateDirectPDF(userName.trim() || "Valued User");
     }
 
-    // PURE VECTOR JSPDF GENERATOR
+    // ENHANCED VIBRANT VECTOR JSPDF GENERATOR
     function generateDirectPDF(userName) {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         const d = currentReportData;
         const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
-        let y = 18;
+        // 1. Top Decorative Header Banner
+        doc.setFillColor(26, 60, 94);
+        doc.rect(0, 0, 210, 8, "F");
+
+        doc.setFillColor(26, 115, 232);
+        doc.rect(0, 8, 210, 3, "F");
+
+        let y = 24;
 
         // Title Header
         doc.setFont("Helvetica", "bold");
-        doc.setFontSize(18);
+        doc.setFontSize(20);
         doc.setTextColor(26, 60, 94);
         doc.text("Fitness & Health Analysis Report", 105, y, { align: "center" });
         
@@ -389,30 +502,27 @@
         doc.setTextColor(100, 100, 100);
         doc.text("Fitness Calculator by Joash Sam", 105, y, { align: "center" });
 
-        y += 6;
-        doc.setLineWidth(0.5);
-        doc.setDrawColor(26, 60, 94);
-        doc.line(15, y, 195, y);
+        y += 8;
 
         // Personal Details Box
-        y += 10;
-        doc.setFillColor(248, 249, 250);
-        doc.roundedRect(15, y, 180, 32, 3, 3, "F");
+        doc.setFillColor(245, 247, 250);
+        doc.setDrawColor(218, 222, 224);
+        doc.roundedRect(15, y, 180, 32, 3, 3, "FD");
 
         doc.setFont("Helvetica", "bold");
         doc.setFontSize(10);
         doc.setTextColor(26, 60, 94);
 
-        doc.text(`Report For: ${userName}`, 20, y + 8);
-        doc.text(`Date: ${today}`, 110, y + 8);
+        doc.text(`Report For: ${userName}`, 22, y + 9);
+        doc.text(`Date: ${today}`, 112, y + 9);
 
         doc.setFont("Helvetica", "normal");
-        doc.setTextColor(50, 50, 50);
-        doc.text(`Age: ${d.age || 'N/A'} yrs`, 20, y + 16);
-        doc.text(`Gender: ${d.gender.toUpperCase()}`, 110, y + 16);
+        doc.setTextColor(60, 60, 60);
+        doc.text(`Age: ${d.age || 'N/A'} yrs`, 22, y + 17);
+        doc.text(`Gender: ${d.gender.toUpperCase()}`, 112, y + 17);
 
-        doc.text(`Weight: ${d.weight}  |  Height: ${d.height}`, 20, y + 24);
-        doc.text(`Neck: ${d.neck}  |  Waist: ${d.waist}  |  Hip: ${d.hip}`, 110, y + 24);
+        doc.text(`Weight: ${d.weight}  |  Height: ${d.height}`, 22, y + 25);
+        doc.text(`Neck: ${d.neck}  |  Waist: ${d.waist}  |  Hip: ${d.hip}`, 112, y + 25);
 
         y += 40;
 
@@ -422,74 +532,94 @@
         doc.setTextColor(26, 60, 94);
         doc.text("Body Composition & Health Metrics", 15, y);
 
-        y += 6;
+        y += 7;
 
-        // Helper to Draw Metric Box safely
-        function addMetricBox(title, val, status, range, tip) {
+        // Helper to Draw Colorful Metric Box
+        function addMetricBox(title, val, status, range, tip, theme) {
             if (y > 240) { doc.addPage(); y = 20; }
             
             const cleanRange = String(range).replace(/≤/g, '<=').replace(/≥/g, '>=');
+            const rgb = (theme && theme.rgb) ? theme.rgb : [26, 115, 232];
 
+            // Box Container
             doc.setFillColor(255, 255, 255);
-            doc.setDrawColor(218, 222, 224);
-            doc.roundedRect(15, y, 180, 26, 2, 2, "FD");
+            doc.setDrawColor(220, 225, 230);
+            doc.roundedRect(15, y, 180, 27, 3, 3, "FD");
+
+            // Colored Left Accent Bar
+            doc.setFillColor(rgb[0], rgb[1], rgb[2]);
+            doc.rect(15, y, 3.5, 27, "F");
 
             doc.setFont("Helvetica", "bold");
-            doc.setFontSize(10);
+            doc.setFontSize(10.5);
             doc.setTextColor(30, 30, 30);
-            doc.text(`${title}: ${val}`, 20, y + 7);
+            doc.text(`${title}: ${val}`, 22, y + 8);
 
-            doc.setTextColor(26, 115, 232);
-            doc.text(`Status: ${status}`, 125, y + 7);
+            // Status Badge (Pill Style)
+            doc.setFillColor(rgb[0], rgb[1], rgb[2]);
+            doc.roundedRect(132, y + 3, 58, 6.5, 2, 2, "F");
+            doc.setFont("Helvetica", "bold");
+            doc.setFontSize(7.5);
+            doc.setTextColor(255, 255, 255);
+            doc.text(status.toUpperCase(), 161, y + 7.5, { align: "center" });
 
             doc.setFont("Helvetica", "normal");
             doc.setFontSize(9);
             doc.setTextColor(80, 80, 80);
-            doc.text(`Target/Normal Range: ${cleanRange}`, 20, y + 14);
+            doc.text(`Target/Normal Range: ${cleanRange}`, 22, y + 15);
 
-            const splitTip = doc.splitTextToSize(`Tip: ${tip}`, 170);
-            doc.text(splitTip[0] || "", 20, y + 20);
+            const splitTip = doc.splitTextToSize(`Tip: ${tip}`, 168);
+            doc.text(splitTip[0] || "", 22, y + 21);
 
-            y += 30;
+            y += 32;
         }
 
         // 1. BMI
-        addMetricBox("BMI (Body Mass Index)", d.bmi, d.evalBMI.status, d.evalBMI.range, d.evalBMI.tip);
+        addMetricBox("BMI (Body Mass Index)", d.bmi, d.evalBMI.status, d.evalBMI.range, d.evalBMI.tip, d.evalBMI.theme);
 
         // 2. Body Fat %
         if (d.bodyFat) {
-            addMetricBox("Body Fat Percentage", d.bodyFat.val, d.bodyFat.status, d.bodyFat.range, d.bodyFat.tip);
+            addMetricBox("Body Fat Percentage", d.bodyFat.val, d.bodyFat.status, d.bodyFat.range, d.bodyFat.tip, d.bodyFat.theme);
         }
 
         // 3. WHR
         if (d.whr) {
-            addMetricBox("Waist-to-Hip Ratio (WHR)", d.whr.val, d.whr.status, d.whr.range, d.whr.tip);
+            addMetricBox("Waist-to-Hip Ratio (WHR)", d.whr.val, d.whr.status, d.whr.range, d.whr.tip, d.whr.theme);
         }
 
         // 4. WHtR
         if (d.whtr) {
-            addMetricBox("Waist-to-Height Ratio (WHtR)", d.whtr.val, d.whtr.status, d.whtr.range, d.whtr.tip);
+            addMetricBox("Waist-to-Height Ratio (WHtR)", d.whtr.val, d.whtr.status, d.whtr.range, d.whtr.tip, d.whtr.theme);
         }
 
-        // Overall Metabolic or Cardiovascular Risk Box
+        // Overall Risk Summary Box
         if (d.metabolicRisk) {
             y += 2;
+            const rgb = d.metabolicRisk.theme.rgb;
+
             doc.setFillColor(248, 249, 250);
-            doc.setDrawColor(26, 115, 232);
-            doc.roundedRect(15, y, 180, 22, 3, 3, "FD");
+            doc.setDrawColor(rgb[0], rgb[1], rgb[2]);
+            doc.roundedRect(15, y, 180, 24, 3, 3, "FD");
+
+            // Left risk highlight bar
+            doc.setFillColor(rgb[0], rgb[1], rgb[2]);
+            doc.rect(15, y, 4, 24, "F");
 
             doc.setFont("Helvetica", "bold");
             doc.setFontSize(10.5);
             doc.setTextColor(26, 60, 94);
-            doc.text(`Metabolic or Cardiovascular Disease Risk: ${d.metabolicRisk.level.toUpperCase()} RISK`, 20, y + 8);
+            doc.text(`Metabolic or Cardiovascular Disease Risk: `, 22, y + 9);
+            
+            doc.setTextColor(rgb[0], rgb[1], rgb[2]);
+            doc.text(`${d.metabolicRisk.level.toUpperCase()} RISK`, 108, y + 9);
 
             doc.setFont("Helvetica", "normal");
             doc.setFontSize(8.5);
             doc.setTextColor(80, 80, 80);
-            const riskTipSplit = doc.splitTextToSize(`Guidance: ${d.metabolicRisk.tip}`, 170);
-            doc.text(riskTipSplit[0] || "", 20, y + 15);
+            const riskTipSplit = doc.splitTextToSize(`Guidance: ${d.metabolicRisk.tip}`, 168);
+            doc.text(riskTipSplit[0] || "", 22, y + 17);
 
-            y += 30;
+            y += 32;
         }
 
         // Medical Disclaimer Footer
