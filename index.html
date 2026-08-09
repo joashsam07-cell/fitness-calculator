@@ -595,23 +595,37 @@
         const rawN = parseFloat(document.getElementById('fit-neck').value) || 0;
         const n = unitToCm(rawN, document.getElementById('fit-n-unit').value);
         const rawWa = parseFloat(document.getElementById('fit-waist').value) || 0;
-        const wa = unitToCm(rawWa, document.getElementById('fit-wa-unit').value);
+        const wa = unitToCm(rawWa, document.getElementById('fit-waist-unit') ? document.getElementById('fit-waist-unit').value : document.getElementById('fit-wa-unit').value);
         const rawHi = parseFloat(document.getElementById('fit-hip').value) || 0;
         const hi = unitToCm(rawHi, document.getElementById('fit-hi-unit').value);
         const g = document.getElementById('fit-gender').value;
         const age = parseInt(document.getElementById('fit-age').value) || 0;
 
-        if (!w || h < 50 || !wa || !n || !hi) return alert("Please fill all inputs.");
+        if (!w || h < 50 || !wa || !n || !hi) {
+            return alert("Please fill in all inputs (Height, Weight, Neck, Waist, and Hip) to perform Fitness Pro analysis.");
+        }
+
+        if (g === 'male' && wa <= n) {
+            return alert("Waist measurement must be larger than neck measurement for accurate Body Fat calculation.");
+        }
+        if (g === 'female' && (wa + hi) <= n) {
+            return alert("Combined Waist and Hip measurements must be larger than neck measurement.");
+        }
 
         let html = '';
         const bmi = (w / ((h/100)**2)).toFixed(1);
         const evalBMI = getBMIEvaluation(bmi, age, h, wUnit);
         html += renderCard('BMI Score', bmi, evalBMI.status, evalBMI.theme, evalBMI.range, evalBMI.targetInfo, evalBMI.tip);
 
-        const bfatVal = (g === 'male') 
-            ? (495 / (1.0324 - 0.19077 * Math.log10(wa - n) + 0.15456 * Math.log10(h)) - 450)
-            : (495 / (1.29579 - 0.35004 * Math.log10(wa + hi - n) + 0.22100 * Math.log10(h)) - 450);
-        
+        let bfatVal = 0;
+        if (g === 'male') {
+            bfatVal = 495 / (1.0324 - 0.19077 * Math.log10(wa - n) + 0.15456 * Math.log10(h)) - 450;
+        } else {
+            bfatVal = 495 / (1.29579 - 0.35004 * Math.log10(wa + hi - n) + 0.22100 * Math.log10(h)) - 450;
+        }
+
+        if (isNaN(bfatVal) || !isFinite(bfatVal) || bfatVal < 2) bfatVal = 5;
+
         const bfat = bfatVal.toFixed(1);
         let bfatTheme = Theme.green, bfatStatus = 'Fit / Ideal', bfatRange = (g === 'male' ? '14% – 24%' : '21% – 31%'), bfatTip = '';
 
@@ -652,7 +666,7 @@
             type: 'Full Fitness Pro', age, gender: g, weight: `${rawW} ${wUnit}`, height: `${h.toFixed(1)} cm`,
             neck: `${rawN} ${document.getElementById('fit-n-unit').value}`,
             waist: `${rawWa} ${document.getElementById('fit-wa-unit').value}`,
-            hip: `${rawHi} ${document.getElementById('fit-hip-unit').value}`,
+            hip: `${rawHi} ${document.getElementById('fit-hi-unit').value}`,
             bmi, evalBMI,
             bodyFat: { val: `${bfat}%`, status: bfatStatus, range: bfatRange, tip: bfatTip, theme: bfatTheme },
             whr: { val: whr, status: whrStatus, range: `≤ ${whrLimit}`, tip: whrTip, theme: whrTheme },
