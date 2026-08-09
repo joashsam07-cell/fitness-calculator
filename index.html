@@ -88,8 +88,17 @@
         .seo-info-container h2 { font-size: 1.05rem; color: var(--navy); margin-top: 15px; margin-bottom: 5px; }
         .seo-info-container ul { padding-left: 18px; margin-top: 5px; }
 
-        /* Hidden PDF Container for html2pdf generation */
-        #pdf-template { display: none; font-family: 'Segoe UI', Arial, sans-serif; padding: 25px; color: #3c4043; background: #fff; width: 680px; }
+        /* FIXED: Hidden PDF Container for html2pdf generation using Off-Screen Positioning */
+        #pdf-template { 
+            position: absolute;
+            left: -9999px;
+            top: 0;
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            padding: 25px; 
+            color: #3c4043; 
+            background: #fff; 
+            width: 680px; 
+        }
         .pdf-header { text-align: center; border-bottom: 2px solid #1a3c5e; padding-bottom: 12px; margin-bottom: 18px; }
         .pdf-header h1 { color: #1a3c5e; margin: 0; font-size: 1.6rem; }
         .pdf-header p { margin: 4px 0 0 0; font-size: 0.85rem; color: #5f6368; font-style: italic; }
@@ -531,21 +540,18 @@
                 </div>`;
         }
 
-        // Generate PDF using html2pdf.js
+        // FIXED: Generate PDF directly without toggling display property
         const element = document.getElementById('pdf-template');
-        element.style.display = 'block';
 
         const opt = {
             margin:       10,
             filename:     `Fitness_Report_${userName.replace(/[^a-z0-9]/gi, '_')}.pdf`,
             image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2 },
+            html2canvas:  { scale: 2, scrollY: 0 },
             jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
 
-        html2pdf().set(opt).from(element).save().then(() => {
-            element.style.display = 'none';
-        });
+        html2pdf().set(opt).from(element).save();
     }
 </script>
 </body>
