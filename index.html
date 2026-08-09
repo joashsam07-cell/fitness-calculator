@@ -250,8 +250,8 @@
         const bmi = (w / ((h/100)**2)).toFixed(1);
         const evalBMI = getBMIEvaluation(bmi, age, h, wUnit);
 
+        // PDF button omitted here
         let html = renderCard('BMI Score', bmi, evalBMI.status, evalBMI.theme, evalBMI.range, evalBMI.targetInfo, evalBMI.tip);
-        html += `<button class="btn-pdf" onclick="promptAndGeneratePDF()">📄 Download PDF Summary</button>`;
 
         document.getElementById('bmi-only-res').innerHTML = html;
 
@@ -315,6 +315,7 @@
         let whtrTip = (whtr <= 0.50) ? 'Your waist size is safely under half your height.' : 'Waist is more than half your height. Focus on reducing waist circumference.';
         html += renderCard('Waist-to-Height Ratio (WHtR)', whtr, whtrStatus, whtrTheme, '≤ 0.50', `Keep waist size under: ≤ ${targetWaistFromH} cm`, whtrTip);
 
+        // Keep PDF Download button for Fitness Pro
         html += `<button class="btn-pdf" onclick="promptAndGeneratePDF()">📄 Download PDF Summary</button>`;
 
         document.getElementById('fit-pro-res').innerHTML = html;
@@ -340,7 +341,7 @@
         generateDirectPDF(userName.trim() || "Valued User");
     }
 
-    // PURE VECTOR JSPDF GENERATOR (No HTML overlays, No screenshots, Guaranteed output)
+    // PURE VECTOR JSPDF GENERATOR
     function generateDirectPDF(userName) {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
@@ -396,13 +397,15 @@
 
         y += 6;
 
-        // Helper to Draw Metric Box
+        // Helper to Draw Metric Box safely
         function addMetricBox(title, val, status, range, tip) {
-            if (y > 250) { doc.addPage(); y = 20; }
+            if (y > 240) { doc.addPage(); y = 20; }
             
+            const cleanRange = String(range).replace(/≤/g, '<=').replace(/≥/g, '>=');
+
             doc.setFillColor(255, 255, 255);
             doc.setDrawColor(218, 222, 224);
-            doc.roundedRect(15, y, 180, 24, 2, 2, "FD");
+            doc.roundedRect(15, y, 180, 26, 2, 2, "FD");
 
             doc.setFont("Helvetica", "bold");
             doc.setFontSize(10);
@@ -410,18 +413,17 @@
             doc.text(`${title}: ${val}`, 20, y + 7);
 
             doc.setTextColor(26, 115, 232);
-            doc.text(`Status: ${status}`, 130, y + 7);
+            doc.text(`Status: ${status}`, 125, y + 7);
 
             doc.setFont("Helvetica", "normal");
             doc.setFontSize(9);
             doc.setTextColor(80, 80, 80);
-            doc.text(`Target/Normal Range: ${range}`, 20, y + 13);
+            doc.text(`Target/Normal Range: ${cleanRange}`, 20, y + 14);
 
-            // Wrap tip text properly inside box
             const splitTip = doc.splitTextToSize(`Tip: ${tip}`, 170);
-            doc.text(splitTip[0] || "", 20, y + 19);
+            doc.text(splitTip[0] || "", 20, y + 20);
 
-            y += 28;
+            y += 30;
         }
 
         let riskScore = 10;
