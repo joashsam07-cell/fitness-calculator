@@ -201,7 +201,7 @@
                 </div>
                 <div class="res-val">${value}</div>
             </div>
-            <div class="res-target"><b>Normal Range:</b> ${normalRange}</div>
+            ${normalRange ? `<div class="res-target"><b>Normal Range:</b> ${normalRange}</div>` : ''}
             ${targetInfo ? `<div class="res-target"><b>Target Guidance:</b> ${targetInfo}</div>` : ''}
             <div class="tip-box" style="border-color:${theme.text}">
                 <b>Tip:</b> ${tip}
@@ -227,13 +227,33 @@
         }
 
         if (bmi < min) {
-            return { status: 'Underweight', theme: Theme.orange, range: `${min} – ${max}`, targetInfo, tip: 'Your weight is low. Focus on a nutrient-dense caloric surplus and resistance training.' };
+            return { rawCategory: 'underweight', status: 'Underweight', theme: Theme.orange, range: `${min} – ${max}`, targetInfo, tip: 'Your weight is low. Focus on a nutrient-dense caloric surplus and resistance training.' };
         } else if (bmi <= max) {
-            return { status: 'Healthy Weight', theme: Theme.green, range: `${min} – ${max}`, targetInfo, tip: 'Your weight is optimal! Maintain this balance through regular physical activity and balanced nutrition.' };
+            return { rawCategory: 'normal', status: 'Healthy Weight', theme: Theme.green, range: `${min} – ${max}`, targetInfo, tip: 'Your weight is optimal! Maintain this balance through regular physical activity and balanced nutrition.' };
         } else if (bmi <= 29.9) {
-            return { status: 'Overweight', theme: Theme.orange, range: `${min} – ${max}`, targetInfo, tip: 'Your weight is slightly high. Consider a mild caloric deficit and regular exercise.' };
+            return { rawCategory: 'overweight', status: 'Overweight', theme: Theme.orange, range: `${min} – ${max}`, targetInfo, tip: 'Your weight is slightly high. Consider a mild caloric deficit and regular exercise.' };
         } else {
-            return { status: 'High Risk (Obese)', theme: Theme.red, range: `${min} – ${max}`, targetInfo, tip: 'Your weight is significantly high. Consult a healthcare professional for a tailored plan.' };
+            return { rawCategory: 'obese', status: 'High Risk (Obese)', theme: Theme.red, range: `${min} – ${max}`, targetInfo, tip: 'Your weight is significantly high. Consult a healthcare professional for a tailored plan.' };
+        }
+    }
+
+    // Comprehensive Risk Assessment Matrix based on BMI & Body Shape (WHR/WHtR)
+    function evaluateMetabolicRisk(bmiCategory, isAndroid) {
+        if (bmiCategory === 'normal' || bmiCategory === 'underweight') {
+            if (isAndroid) {
+                return { level: 'Moderate', theme: Theme.orange, tip: 'Normal weight with central fat distribution (Android shape). Monitor lifestyle to reduce metabolic risk.' };
+            }
+            return { level: 'Low', theme: Theme.green, tip: 'Healthy weight and body shape proportions. Risk profile is minimal.' };
+        } else if (bmiCategory === 'overweight') {
+            if (isAndroid) {
+                return { level: 'High', theme: Theme.red, tip: 'Overweight with elevated waist ratios. High indication for aerobic exercise and nutritional adjustment.' };
+            }
+            return { level: 'Moderate', theme: Theme.orange, tip: 'Slightly elevated weight with standard proportions. Moderate overall cardiovascular risk.' };
+        } else { // Obese
+            if (isAndroid) {
+                return { level: 'Very High', theme: Theme.red, tip: 'Obesity combined with central fat distribution. Strong indication to consult a physician.' };
+            }
+            return { level: 'High', theme: Theme.red, tip: 'Elevated weight class. High metabolic and cardiovascular risk profile.' };
         }
     }
 
@@ -250,14 +270,13 @@
         const bmi = (w / ((h/100)**2)).toFixed(1);
         const evalBMI = getBMIEvaluation(bmi, age, h, wUnit);
 
-        // PDF button omitted here
         let html = renderCard('BMI Score', bmi, evalBMI.status, evalBMI.theme, evalBMI.range, evalBMI.targetInfo, evalBMI.tip);
 
         document.getElementById('bmi-only-res').innerHTML = html;
 
         currentReportData = {
             type: 'BMI Only', age, gender: g, weight: `${rawW} ${wUnit}`, height: `${h.toFixed(1)} cm`,
-            neck: '-', waist: '-', hip: '-', bmi, evalBMI, bodyFat: null, whr: null, whtr: null
+            neck: '-', waist: '-', hip: '-', bmi, evalBMI, bodyFat: null, whr: null, whtr: null, metabolicRisk: null
         };
 
         sendDataToGoogleSheet({ age, gender: g, height: h.toFixed(1), weight: w.toFixed(1), bmi, bodyFat: "-", whr: "-", whtr: "-" });
@@ -315,7 +334,14 @@
         let whtrTip = (whtr <= 0.50) ? 'Your waist size is safely under half your height.' : 'Waist is more than half your height. Focus on reducing waist circumference.';
         html += renderCard('Waist-to-Height Ratio (WHtR)', whtr, whtrStatus, whtrTheme, '≤ 0.50', `Keep waist size under: ≤ ${targetWaistFromH} cm`, whtrTip);
 
-        // Keep PDF Download button for Fitness Pro
+        // Detect Android Shape (elevated central waist ratios)
+        const isAndroid = (whr > whrLimit) || (whtr > 0.50);
+        const riskEval = evaluateMetabolicRisk(evalBMI.rawCategory, isAndroid);
+
+        // Render Summary Card for Metabolic / CV Risk
+        html += renderCard('Metabolic or Cardiovascular Disease Risk', riskEval.level, `${riskEval.level} Risk`, riskEval.theme, null, null, riskEval.tip);
+
+        // PDF Download button for Fitness Pro
         html += `<button class="btn-pdf" onclick="promptAndGeneratePDF()">📄 Download PDF Summary</button>`;
 
         document.getElementById('fit-pro-res').innerHTML = html;
@@ -328,7 +354,8 @@
             bmi, evalBMI,
             bodyFat: { val: `${bfat}%`, status: bfatStatus, range: bfatRange, tip: bfatTip },
             whr: { val: whr, status: whrStatus, range: `≤ ${whrLimit}`, tip: whrTip },
-            whtr: { val: whtr, status: whtrStatus, range: '≤ 0.50', tip: whtrTip }
+            whtr: { val: whtr, status: whtrStatus, range: '≤ 0.50', tip: whtrTip },
+            metabolicRisk: riskEval
         };
 
         sendDataToGoogleSheet({ age, gender: g, height: h.toFixed(1), weight: w.toFixed(1), bmi, bodyFat: bfat, whr, whtr });
@@ -426,50 +453,44 @@
             y += 30;
         }
 
-        let riskScore = 10;
-
         // 1. BMI
-        if (parseFloat(d.bmi) >= 25) riskScore += 25;
-        if (parseFloat(d.bmi) >= 30) riskScore += 20;
         addMetricBox("BMI (Body Mass Index)", d.bmi, d.evalBMI.status, d.evalBMI.range, d.evalBMI.tip);
 
         // 2. Body Fat %
         if (d.bodyFat) {
-            if (d.bodyFat.status === 'High Fat') riskScore += 20;
             addMetricBox("Body Fat Percentage", d.bodyFat.val, d.bodyFat.status, d.bodyFat.range, d.bodyFat.tip);
         }
 
         // 3. WHR
         if (d.whr) {
-            if (d.whr.status === 'High Health Risk') riskScore += 15;
             addMetricBox("Waist-to-Hip Ratio (WHR)", d.whr.val, d.whr.status, d.whr.range, d.whr.tip);
         }
 
         // 4. WHtR
         if (d.whtr) {
-            if (d.whtr.status === 'Increased Risk') riskScore += 15;
             addMetricBox("Waist-to-Height Ratio (WHtR)", d.whtr.val, d.whtr.status, d.whtr.range, d.whtr.tip);
         }
 
-        // Combined Risk Box
-        y += 2;
-        const finalRisk = Math.min(Math.max(riskScore, 12), 95);
-        
-        doc.setFillColor(248, 249, 250);
-        doc.setDrawColor(26, 115, 232);
-        doc.roundedRect(15, y, 180, 20, 3, 3, "FD");
+        // Overall Metabolic or Cardiovascular Risk Box
+        if (d.metabolicRisk) {
+            y += 2;
+            doc.setFillColor(248, 249, 250);
+            doc.setDrawColor(26, 115, 232);
+            doc.roundedRect(15, y, 180, 22, 3, 3, "FD");
 
-        doc.setFont("Helvetica", "bold");
-        doc.setFontSize(10);
-        doc.setTextColor(26, 60, 94);
-        doc.text(`Estimated Combined Health Risk: ${finalRisk}%`, 20, y + 8);
+            doc.setFont("Helvetica", "bold");
+            doc.setFontSize(10.5);
+            doc.setTextColor(26, 60, 94);
+            doc.text(`Metabolic or Cardiovascular Disease Risk: ${d.metabolicRisk.level.toUpperCase()} RISK`, 20, y + 8);
 
-        doc.setFont("Helvetica", "normal");
-        doc.setFontSize(8.5);
-        doc.setTextColor(100, 100, 100);
-        doc.text("Calculated based on deviation from ideal BMI, WHR, and WHtR healthy limits.", 20, y + 14);
+            doc.setFont("Helvetica", "normal");
+            doc.setFontSize(8.5);
+            doc.setTextColor(80, 80, 80);
+            const riskTipSplit = doc.splitTextToSize(`Guidance: ${d.metabolicRisk.tip}`, 170);
+            doc.text(riskTipSplit[0] || "", 20, y + 15);
 
-        y += 28;
+            y += 30;
+        }
 
         // Medical Disclaimer Footer
         doc.setFont("Helvetica", "italic");
