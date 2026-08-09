@@ -41,7 +41,7 @@
             --navy: #1a3c5e; 
         }
         body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); display: flex; flex-direction: column; align-items: center; padding: 20px; color: #3c4043; min-height: 100vh; margin: 0; box-sizing: border-box; }
-        .card { background: var(--card); padding: 2rem; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.06); width: 100%; max-width: 520px; box-sizing: border-box; }
+        .card { background: var(--card); padding: 2rem; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.06); width: 100%; max-width: 520px; box-sizing: border-box; position: relative; z-index: 1; }
         
         .brand-header { margin-bottom: 25px; }
         .brand-text h1 { font-size: 1.8rem; color: var(--navy); margin: 0; line-height: 1.1; font-weight: 800; text-align: center; }
@@ -84,20 +84,22 @@
         .disclaimer { font-size: 0.7rem; color: #5f6368; line-height: 1.5; background: #f8f9fa; padding: 15px; border-radius: 12px; margin-top: 30px; border: 1px solid #dadce0; text-align: center; }
 
         /* SEO Content Block for Google Bots */
-        .seo-info-container { width: 100%; max-width: 520px; margin-top: 30px; font-size: 0.82rem; color: #5f6368; line-height: 1.6; }
+        .seo-info-container { width: 100%; max-width: 520px; margin-top: 30px; font-size: 0.82rem; color: #5f6368; line-height: 1.6; position: relative; z-index: 1; }
         .seo-info-container h2 { font-size: 1.05rem; color: var(--navy); margin-top: 15px; margin-bottom: 5px; }
         .seo-info-container ul { padding-left: 18px; margin-top: 5px; }
 
-        /* FIXED: Hidden PDF Container for html2pdf generation using Off-Screen Positioning */
+        /* Hidden behind page content at coordinate 0,0 */
         #pdf-template { 
-            position: absolute;
-            left: -9999px;
+            position: fixed;
             top: 0;
+            left: 0;
+            z-index: -9999;
             font-family: 'Segoe UI', Arial, sans-serif; 
             padding: 25px; 
             color: #3c4043; 
-            background: #fff; 
+            background: #ffffff; 
             width: 680px; 
+            box-sizing: border-box;
         }
         .pdf-header { text-align: center; border-bottom: 2px solid #1a3c5e; padding-bottom: 12px; margin-bottom: 18px; }
         .pdf-header h1 { color: #1a3c5e; margin: 0; font-size: 1.6rem; }
@@ -117,7 +119,7 @@
         
         .pdf-quote-box { background: #fff3e0; border-left: 4px solid #e65100; color: #e65100; padding: 10px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; margin-top: 10px; text-align: center; }
         
-        .pdf-footer { text-align: center; font-size: 0.72rem; color: #70757a; border-top: 1px solid #dadce0; padding-top: 12px; margin-top: 20px; }
+        .pdf-footer { text-align: center; font-size: 0.72rem; color: #70757a; border-top: 1px solid #dadce0; padding-top: 12px; margin-top: 20px; line-height: 1.4; }
     </style>
 </head>
 <body>
@@ -180,7 +182,7 @@
         <div id="fit-pro-res" class="results-container"></div>
     </div>
 
-    <div class="disclaimer"><b>Disclaimer:</b> Educational purpose only. Anonymous data is recorded for research/study purposes.</div>
+    <div class="disclaimer"><b>Disclaimer:</b> Educational purpose only. Should not substitute professional medical advice. Anonymous data is recorded for research purposes.</div>
 </div>
 
 <!-- SEO Content Section for Search Engines -->
@@ -220,7 +222,7 @@
     <div class="pdf-footer">
         <b>Fitness & BMI Calculator Pro</b> | Developed by Joash Sam<br>
         Web App: https://joashsam07-cell.github.io/fitness-calculator/<br>
-        <i>This report is intended for educational and fitness tracking purposes only.</i>
+        <i>Notice: This report is generated for educational and fitness tracking purposes only and should not substitute professional medical advice, diagnosis, or treatment.</i>
     </div>
 </div>
 
@@ -453,10 +455,8 @@
             <div class="pdf-grid-item"><b>Height:</b> ${d.height}</div>
             <div class="pdf-grid-item"><b>Waist:</b> ${d.waist}</div>
             <div class="pdf-grid-item"><b>Hip:</b> ${d.hip}</div>
+            <div class="pdf-grid-item"><b>Neck:</b> ${d.neck}</div>
         `;
-        if (d.gender.toLowerCase() === 'female') {
-            userInfoHTML += `<div class="pdf-grid-item"><b>Neck:</b> ${d.neck}</div>`;
-        }
         document.getElementById('pdf-user-info').innerHTML = userInfoHTML;
 
         // Build Metrics List & Compute Health Risk Score
@@ -540,14 +540,20 @@
                 </div>`;
         }
 
-        // FIXED: Generate PDF directly without toggling display property
+        // Generate PDF using html2pdf.js with explicit 0,0 coordinates
         const element = document.getElementById('pdf-template');
 
         const opt = {
             margin:       10,
             filename:     `Fitness_Report_${userName.replace(/[^a-z0-9]/gi, '_')}.pdf`,
             image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2, scrollY: 0 },
+            html2canvas:  { 
+                scale: 2, 
+                scrollX: 0,
+                scrollY: 0,
+                x: 0,
+                y: 0
+            },
             jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
 
