@@ -194,10 +194,103 @@
         
         .tip-box { background: rgba(255, 255, 255, 0.75); padding: 10px 12px; border-radius: 8px; font-size: 0.8rem; line-height: 1.45; font-weight: 500; border-left: 3px solid; margin-top: 4px; }
         
-        .disclaimer { font-size: 0.7rem; color: #5f6368; line-height: 1.5; background: rgba(255, 255, 255, 0.6); padding: 15px; border-radius: 14px; margin-top: 30px; border: 1px solid #cbd5e0; text-align: center; }
+        .disclaimer { font-size: 0.7rem; color: #5f6368; line-height: 1.5; background: rgba(255, 255, 255, 0.6); padding: 15px; border-radius: 14px; margin-top: 20px; border: 1px solid #cbd5e0; text-align: center; }
 
         .seo-info-container { width: 100%; max-width: 520px; margin-top: 30px; font-size: 0.82rem; color: #4a5568; line-height: 1.6; }
         .seo-info-container h2 { font-size: 1.05rem; color: var(--navy); margin-top: 15px; margin-bottom: 5px; }
+
+        /* Lightbulb Trigger Button */
+        .obesity-trigger-btn {
+            background: linear-gradient(135deg, #fff3bf, #ffd43b);
+            color: #5c3900;
+            border: 1px solid #fcc419;
+            padding: 12px 20px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(255, 212, 59, 0.3);
+            transition: all 0.2s ease;
+            margin: 20px 0 10px 0;
+            width: 100%;
+        }
+        .obesity-trigger-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(255, 193, 7, 0.4);
+        }
+
+        /* Modal Overlay & Card Styling */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .modal-content {
+            background: #ffffff;
+            max-width: 520px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            border-radius: 20px;
+            padding: 24px;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+            box-sizing: border-box;
+        }
+        .modal-close {
+            position: absolute;
+            top: 15px; right: 18px;
+            background: #e2e8f0;
+            border: none;
+            font-size: 20px;
+            font-weight: bold;
+            color: #4a5568;
+            cursor: pointer;
+            border-radius: 50%;
+            width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+        }
+        .modal-close:hover { background: #cbd5e0; }
+        .modal-header { display: flex; align-items: center; gap: 8px; margin-bottom: 15px; }
+        .modal-header h2 { margin: 0; font-size: 1.25rem; color: #1a3c5e; }
+
+        .mother-disease-card {
+            background: #ffebee;
+            border-left: 4px solid #ef5350;
+            padding: 14px;
+            border-radius: 10px;
+            margin-bottom: 18px;
+        }
+        .mother-disease-card h3 { margin: 0 0 6px 0; color: #c62828; font-size: 0.95rem; }
+        .mother-disease-card p { margin: 0; font-size: 0.8rem; color: #333; line-height: 1.45; }
+        .disease-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+        .tag { background: #ffcdd2; color: #b71c1c; font-size: 0.7rem; font-weight: 700; padding: 4px 8px; border-radius: 6px; }
+
+        .factors-title { font-size: 0.95rem; margin: 15px 0 4px 0; color: #1a3c5e; }
+        .subtext { font-size: 0.75rem; color: #666; margin-bottom: 10px; }
+
+        .accordion-item { border: 1px solid #e2e8f0; border-radius: 10px; margin-bottom: 8px; overflow: hidden; }
+        .accordion-header {
+            width: 100%; background: #f8fafc; border: none; padding: 10px 14px;
+            text-align: left; font-weight: 700; font-size: 0.82rem; color: #2c3e50;
+            cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+            margin: 0; box-shadow: none;
+        }
+        .accordion-header:hover { background: #f1f5f9; }
+        .accordion-content { display: none; padding: 10px 14px; background: #fff; font-size: 0.78rem; color: #4a5568; border-top: 1px solid #e2e8f0; line-height: 1.45; }
+        .accordion-item.active .accordion-content { display: block; }
     </style>
 </head>
 <body>
@@ -213,7 +306,7 @@
     <div class="tabs-container">
         <!-- Right-aligned Floating Pointer -->
         <div id="fit-pointer" class="fit-pro-pointer" onclick="switchTabToFitPro()">
-            Get Body Fat %
+            👈 Get Body Fat %
         </div>
 
         <div class="tabs">
@@ -267,7 +360,79 @@
         <div id="fit-pro-res" class="results-container"></div>
     </div>
 
+    <!-- Lightbulb Trigger Button -->
+    <button id="obesityInfoBtn" class="obesity-trigger-btn" type="button">
+        💡 Learn how obesity affects your health
+    </button>
+
     <div class="disclaimer"><b>Disclaimer:</b> Educational purpose only. Should not substitute professional medical advice. Anonymous data is recorded for research purposes.</div>
+</div>
+
+<!-- Interactive Obesity Information Modal Overlay -->
+<div id="obesityModal" class="modal-overlay">
+  <div class="modal-content">
+    <button class="modal-close" id="closeObesityModal">&times;</button>
+    
+    <div class="modal-header">
+      <span style="font-size: 1.4rem;">💡</span>
+      <h2>Understanding Obesity & Health</h2>
+    </div>
+
+    <div class="mother-disease-card">
+      <h3>The "Mother of All Diseases"</h3>
+      <p>
+        Obesity is defined as body weight more than <strong>20% above a desirable standard</strong> due to an excessive accumulation of adipose tissue (fat). It acts as a primary gateway to conditions including:
+      </p>
+      <div class="disease-tags">
+        <span class="tag">Cardiovascular Disease</span>
+        <span class="tag">Hypertension</span>
+        <span class="tag">Pulmonary Disease</span>
+        <span class="tag">Type II Diabetes</span>
+        <span class="tag">Arthritis</span>
+        <span class="tag">Varicose Veins</span>
+        <span class="tag">Gallbladder Disease</span>
+        <span class="tag">Certain Cancers</span>
+      </div>
+    </div>
+
+    <div class="factors-title"><b>Factors Leading to Obesity</b></div>
+    <div class="subtext">Click any factor to explore details:</div>
+
+    <div class="accordion">
+      <div class="accordion-item">
+        <button class="accordion-header" type="button">⚡ Positive Energy Balance (Caloric Factor) <span>+</span></button>
+        <div class="accordion-content">Consuming more calories than your body expends daily leading to excessive fat storage.</div>
+      </div>
+      <div class="accordion-item">
+        <button class="accordion-header" type="button">🍞 Refined Carbohydrates <span>+</span></button>
+        <div class="accordion-content">High intake of processed sugars and simple carbs that spike insulin levels and promote fat storage.</div>
+      </div>
+      <div class="accordion-item">
+        <button class="accordion-header" type="button">⏳ Metabolic Slowdown (Age Factor) <span>+</span></button>
+        <div class="accordion-content">Natural reduction in basal metabolic rate (BMR) as muscle mass decreases with age.</div>
+      </div>
+      <div class="accordion-item">
+        <button class="accordion-header" type="button">🛋️ Physical Inactivity (Lifestyle Factor) <span>+</span></button>
+        <div class="accordion-content">Sedentary daily habits reducing energy expenditure and metabolic efficiency.</div>
+      </div>
+      <div class="accordion-item">
+        <button class="accordion-header" type="button">🧬 Biological, Hereditary & Viral Factors <span>+</span></button>
+        <div class="accordion-content">Genetic predispositions, hormonal imbalances, and underlying metabolic conditions.</div>
+      </div>
+      <div class="accordion-item">
+        <button class="accordion-header" type="button">😴 Sleep Deprivation <span>+</span></button>
+        <div class="accordion-content">Lack of sleep disrupts appetite hormones (leptin and ghrelin), increasing food cravings.</div>
+      </div>
+      <div class="accordion-item">
+        <button class="accordion-header" type="button">🚬 Smoking & Alcohol Consumption <span>+</span></button>
+        <div class="accordion-content">Alcohol supplies empty calories while substance habits interfere with optimal metabolic performance.</div>
+      </div>
+      <div class="accordion-item">
+        <button class="accordion-header" type="button">🧠 Stress (Psychological & Environmental) <span>+</span></button>
+        <div class="accordion-content">Chronic stress raises cortisol levels, driving emotional eating and abdominal fat accumulation.</div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <article class="seo-info-container">
@@ -487,7 +652,7 @@
             type: 'Full Fitness Pro', age, gender: g, weight: `${rawW} ${wUnit}`, height: `${h.toFixed(1)} cm`,
             neck: `${rawN} ${document.getElementById('fit-n-unit').value}`,
             waist: `${rawWa} ${document.getElementById('fit-wa-unit').value}`,
-            hip: `${rawHi} ${document.getElementById('fit-hi-unit').value}`,
+            hip: `${rawHi} ${document.getElementById('fit-hip-unit').value}`,
             bmi, evalBMI,
             bodyFat: { val: `${bfat}%`, status: bfatStatus, range: bfatRange, tip: bfatTip, theme: bfatTheme },
             whr: { val: whr, status: whrStatus, range: `≤ ${whrLimit}`, tip: whrTip, theme: whrTheme },
@@ -666,6 +831,21 @@
         // Save PDF file cleanly
         doc.save(`Fitness_Report_${userName.replace(/[^a-z0-9]/gi, '_')}.pdf`);
     }
+
+    // Modal & Accordion Interactive Logic
+    const modal = document.getElementById('obesityModal');
+    const btn = document.getElementById('obesityInfoBtn');
+    const closeBtn = document.getElementById('closeObesityModal');
+
+    btn.onclick = function() { modal.style.display = "flex"; }
+    closeBtn.onclick = function() { modal.style.display = "none"; }
+    window.onclick = function(event) { if (event.target == modal) modal.style.display = "none"; }
+
+    document.querySelectorAll('.accordion-header').forEach(header => {
+      header.addEventListener('click', () => {
+        header.parentElement.classList.toggle('active');
+      });
+    });
 </script>
 </body>
 </html>
