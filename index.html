@@ -13,13 +13,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <title>Fitness & BMI Calculator Pro | Body Fat & Waist Ratios by Joash Sam</title>
-    <meta name="title" content="Fitness & BMI Calculator Pro | Body Fat & Waist Ratios by Joash Sam">
-    <meta name="description" content="Free online health and fitness calculator by Joash Sam. Instantly measure your BMI, Body Fat Percentage, Waist-to-Hip Ratio (WHR), and Waist-to-Height Ratio (WHtR).">
+    <title>Fitness & BMI Calculator Pro | Body Fat & Calorie Budget by Joash Sam</title>
+    <meta name="title" content="Fitness & BMI Calculator Pro | Body Fat & Calorie Budget by Joash Sam">
+    <meta name="description" content="Free online health and fitness calculator by Joash Sam. Instantly measure your BMI, Body Fat Percentage, BMR, TDEE Calorie Requirements, WHR, and WHtR.">
     <meta name="author" content="Joash Sam">
     <meta name="robots" content="index, follow">
 
-    <!-- Direct jsPDF Library (Pure Vector Text PDF Generation - No Screenshots) -->
+    <!-- Direct jsPDF Library (Pure Vector Text PDF Generation) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <style>
@@ -34,6 +34,7 @@
             --green-bg: #e8f5e9; --green-text: #2e7d32; --green-border: #a5d6a7;
             --orange-bg: #fff3e0; --orange-text: #e65100; --orange-border: #ffcc80;
             --red-bg: #ffebee; --red-text: #c62828; --red-border: #ef9a9a;
+            --blue-bg: #e3f2fd; --blue-text: #1565c0; --blue-border: #90caf9;
         }
 
         body { 
@@ -55,92 +56,83 @@
             border-radius: 28px; 
             box-shadow: 0 15px 35px rgba(26, 60, 94, 0.08), 0 5px 15px rgba(0,0,0,0.04); 
             width: 100%; 
-            max-width: 520px; 
+            max-width: 580px; 
             box-sizing: border-box; 
             border: 1px solid rgba(255, 255, 255, 0.8);
             position: relative;
         }
         
-        .brand-header { margin-bottom: 25px; }
+        .brand-header { margin-bottom: 12px; }
         .brand-text h1 { font-size: 1.85rem; color: var(--navy); margin: 0; line-height: 1.1; font-weight: 800; text-align: center; letter-spacing: -0.5px; }
-        .brand-text p { font-size: 0.82rem; color: #5f6368; margin: 6px 12px 0 0; font-weight: 600; letter-spacing: 0.5px; text-align: right; font-style: italic; opacity: 0.85; }
+        .brand-text p { font-size: 0.82rem; color: #5f6368; margin: 4px 12px 0 0; font-weight: 600; letter-spacing: 0.5px; text-align: right; font-style: italic; opacity: 0.85; }
+
+        /* WHO Health Definition Quote */
+        .who-quote {
+            background: rgba(26, 115, 232, 0.05);
+            border-left: 3px solid var(--primary);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            color: #4a5568;
+            font-style: italic;
+            margin-bottom: 35px;
+            text-align: center;
+            line-height: 1.4;
+        }
+        .who-quote b {
+            font-style: normal;
+            color: var(--navy);
+        }
 
         .tabs-container { position: relative; margin-bottom: 25px; }
 
-        .tabs { display: flex; background: #e2e8f0; border-radius: 14px; padding: 4px; }
-        .tab { flex: 1; text-align: center; padding: 12px 5px; cursor: pointer; border-radius: 10px; font-weight: 700; color: #4a5568; transition: all 0.25s ease; font-size: 0.85rem; }
+        .tabs { display: flex; background: #e2e8f0; border-radius: 14px; padding: 4px; gap: 2px; }
+        .tab { flex: 1; text-align: center; padding: 12px 3px; cursor: pointer; border-radius: 10px; font-weight: 700; color: #4a5568; transition: all 0.25s ease; font-size: 0.82rem; }
         .tab.active { background: var(--primary); color: white; box-shadow: 0 4px 14px rgba(26,115,232,0.3); }
         
-        /* Floating Pointer Badge - Right Side */
-        .fit-pro-pointer {
+        /* Floating Pointer Badges */
+        .floater-badge {
             position: absolute;
-            right: -130px;
-            top: 50%;
-            transform: translateY(-50%);
+            top: -28px;
             background: #ff4757;
             color: #ffffff;
-            font-size: 0.78rem;
+            font-size: 0.72rem;
             font-weight: 800;
-            padding: 7px 12px;
-            border-radius: 20px;
-            box-shadow: 0 4px 12px rgba(255, 71, 87, 0.4);
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            animation: nudgeLeft 1.4s infinite ease-in-out;
+            padding: 4px 10px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(255, 71, 87, 0.35);
+            white-space: nowrap;
             cursor: pointer;
             z-index: 10;
-            white-space: nowrap;
+            animation: bouncePoint 1.6s infinite ease-in-out;
         }
 
-        .fit-pro-pointer::before {
+        .floater-badge::after {
             content: '';
             position: absolute;
-            left: -6px;
-            top: 50%;
-            transform: translateY(-50%);
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
             width: 0;
             height: 0;
-            border-top: 6px solid transparent;
-            border-bottom: 6px solid transparent;
-            border-right: 7px solid #ff4757;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 5px solid #ff4757;
         }
 
-        @keyframes nudgeLeft {
-            0%, 100% { transform: translateY(-50%) translateX(0); }
-            50% { transform: translateY(-50%) translateX(-6px); }
-        }
+        #float-cal { left: 34%; }
+        #float-fit { right: 2%; }
 
-        /* Responsive handling for smaller mobile screens */
-        @media (max-width: 680px) {
-            .fit-pro-pointer {
-                right: 10px;
-                top: -30px;
-                transform: none;
-                animation: bouncePoint 1.6s infinite ease-in-out;
-            }
-            .fit-pro-pointer::before { display: none; }
-            .fit-pro-pointer::after {
-                content: '';
-                position: absolute;
-                bottom: -5px;
-                right: 25px;
-                width: 0;
-                height: 0;
-                border-left: 5px solid transparent;
-                border-right: 5px solid transparent;
-                border-top: 6px solid #ff4757;
-            }
-            @keyframes bouncePoint {
-                0%, 100% { transform: translateY(0); }
-                50% { transform: translateY(-5px); }
-            }
+        @keyframes bouncePoint {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
         }
 
         .section { display: none; }
         .section.active { display: block; }
         
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        .full-width { grid-column: span 2; }
         .input-box { position: relative; }
         label { display: block; font-size: 0.75rem; font-weight: 700; color: #4a5568; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.3px; }
         input, select { 
@@ -149,7 +141,7 @@
             border: 1.5px solid #cbd5e0; 
             border-radius: 12px; 
             box-sizing: border-box; 
-            font-size: 0.95rem; 
+            font-size: 0.92rem; 
             outline: none; 
             transition: all 0.2s;
             background: #f8fafc;
@@ -158,6 +150,11 @@
             border-color: var(--primary);
             background: #ffffff;
             box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.15);
+        }
+
+        select option {
+            font-size: 0.85rem;
+            padding: 5px;
         }
         
         .unit-sel { position: absolute; right: 8px; top: 32px; font-size: 0.7rem; border: none; background: #e2e8f0; padding: 4px 6px; border-radius: 6px; width: auto; color: var(--primary); font-weight: bold; cursor: pointer; }
@@ -194,9 +191,25 @@
         
         .tip-box { background: rgba(255, 255, 255, 0.75); padding: 10px 12px; border-radius: 8px; font-size: 0.8rem; line-height: 1.45; font-weight: 500; border-left: 3px solid; margin-top: 4px; }
         
+        .calorie-breakdown {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 6px;
+            text-align: center;
+        }
+        .cal-box {
+            background: rgba(255, 255, 255, 0.85);
+            padding: 8px 4px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+        .cal-title { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; opacity: 0.8; }
+        .cal-num { font-size: 0.95rem; font-weight: 800; margin-top: 2px; }
+
         .disclaimer { font-size: 0.7rem; color: #5f6368; line-height: 1.5; background: rgba(255, 255, 255, 0.6); padding: 15px; border-radius: 14px; margin-top: 20px; border: 1px solid #cbd5e0; text-align: center; }
 
-        .seo-info-container { width: 100%; max-width: 520px; margin-top: 30px; font-size: 0.82rem; color: #4a5568; line-height: 1.6; }
+        .seo-info-container { width: 100%; max-width: 580px; margin-top: 30px; font-size: 0.82rem; color: #4a5568; line-height: 1.6; }
         .seo-info-container h2 { font-size: 1.05rem; color: var(--navy); margin-top: 15px; margin-bottom: 5px; }
 
         /* Lightbulb Trigger Button */
@@ -303,19 +316,29 @@
         </div>
     </div>
 
+    <!-- WHO Definition Quote -->
+    <div class="who-quote">
+        “Health is a state of complete physical, mental and social well-being and not merely the absence of disease or infirmity.”
+        <br><b>— World Health Organization (WHO)</b>
+    </div>
+
     <div class="tabs-container">
-        <!-- Right-aligned Floating Pointer -->
-        <div id="fit-pointer" class="fit-pro-pointer" onclick="switchTabToFitPro()">
-             Get Body Fat %
+        <!-- Floating Pointer Badges -->
+        <div id="float-cal" class="floater-badge" onclick="showTabDirect('cal-sec', 'tab-cal')">
+            Check your calorie requirement
+        </div>
+        <div id="float-fit" class="floater-badge" onclick="showTabDirect('fit-sec', 'tab-fit')">
+             Get your complete fitness profile done
         </div>
 
         <div class="tabs">
             <div id="tab-bmi" class="tab active" onclick="showTab('bmi-sec', event)">BMI Check</div>
+            <div id="tab-cal" class="tab" onclick="showTab('cal-sec', event)">Calorie Check</div>
             <div id="tab-fit" class="tab" onclick="showTab('fit-sec', event)">Fitness Pro</div>
         </div>
     </div>
 
-    <!-- BMI Section -->
+    <!-- Section 1: BMI Check Section -->
     <div id="bmi-sec" class="section active">
         <div class="grid">
             <div><label>Age</label><input type="number" id="bmi-age" placeholder="Years"></div>
@@ -334,7 +357,38 @@
         <div id="bmi-only-res" class="results-container"></div>
     </div>
 
-    <!-- Fitness Pro Section -->
+    <!-- Section 2: Calorie Check Section (Standalone BMR & TDEE) -->
+    <div id="cal-sec" class="section">
+        <div class="grid">
+            <div><label>Age</label><input type="number" id="cal-age" placeholder="Years"></div>
+            <div><label>Gender</label><select id="cal-gender"><option value="male">Male</option><option value="female">Female</option></select></div>
+        </div>
+        <div class="grid">
+            <div class="input-box">
+                <label>Height</label>
+                <input type="number" id="cal-h-cm" placeholder="cm">
+                <div class="dual-input hidden" id="cal-h-ftin"><input type="number" id="cal-h-ft" placeholder="Ft"><input type="number" id="cal-h-in" placeholder="In"></div>
+                <select class="unit-sel" id="cal-h-unit" onchange="toggleHeight('cal')"><option value="cm">cm</option><option value="ft">ft+in</option></select>
+            </div>
+            <div class="input-box"><label>Weight</label><input type="number" id="cal-w"><select class="unit-sel" id="cal-w-unit"><option value="kg">kg</option><option value="lb">lb</option></select></div>
+        </div>
+        <div class="grid">
+            <div class="input-box full-width">
+                <label>Daily Activity Level</label>
+                <select id="cal-activity">
+                    <option value="1.2">Sedentary — Desk job, sitting most day (Little/no exercise)</option>
+                    <option value="1.375">Lightly Active — Teacher, salesman, light walk (Exercise 1–3 days/wk)</option>
+                    <option value="1.55" selected>Moderately Active — Nurse, waiter, active work (Exercise 3–5 days/wk)</option>
+                    <option value="1.725">Very Active — Construction, athlete, heavy lifting (Exercise 6–7 days/wk)</option>
+                    <option value="1.9">Extra Active — Physical labor + hard training / 2x workouts daily</option>
+                </select>
+            </div>
+        </div>
+        <button onclick="calculateOnlyCalories()">Calculate Daily Calorie Needs</button>
+        <div id="cal-only-res" class="results-container"></div>
+    </div>
+
+    <!-- Section 3: Fitness Pro Section (All-in-One + PDF Generator) -->
     <div id="fit-sec" class="section">
         <div class="grid">
             <div><label>Age</label><input type="number" id="fit-age" placeholder="Years"></div>
@@ -354,8 +408,22 @@
             <div class="input-box"><label>Waist</label><input type="number" id="fit-waist"><select class="unit-sel" id="fit-wa-unit"><option value="cm">cm</option><option value="in">in</option></select></div>
         </div>
         <div class="grid">
-            <div class="input-box" style="grid-column: span 2;"><label>Hip (Required for WHR)</label><input type="number" id="fit-hip"><select class="unit-sel" id="fit-hi-unit"><option value="cm">cm</option><option value="in">in</option></select></div>
+            <div class="input-box full-width"><label>Hip (Required for Body Composition)</label><input type="number" id="fit-hip"><select class="unit-sel" id="fit-hi-unit"><option value="cm">cm</option><option value="in">in</option></select></div>
         </div>
+        
+        <div class="grid">
+            <div class="input-box full-width">
+                <label>Daily Activity Level (For Calorie Budget / TDEE)</label>
+                <select id="fit-activity">
+                    <option value="1.2">Sedentary — Desk job, sitting most day (Little/no exercise)</option>
+                    <option value="1.375">Lightly Active — Teacher, salesman, light walk (Exercise 1–3 days/wk)</option>
+                    <option value="1.55" selected>Moderately Active — Nurse, waiter, active work (Exercise 3–5 days/wk)</option>
+                    <option value="1.725">Very Active — Construction, athlete, heavy lifting (Exercise 6–7 days/wk)</option>
+                    <option value="1.9">Extra Active — Physical labor + hard training / 2x workouts daily</option>
+                </select>
+            </div>
+        </div>
+
         <button onclick="calculateFullFitness()">Run Fitness Pro Analysis</button>
         <div id="fit-pro-res" class="results-container"></div>
     </div>
@@ -437,13 +505,13 @@
 
 <article class="seo-info-container">
     <h2>About the Fitness & Body Composition Calculator</h2>
-    <p>This health analysis tool evaluates Body Mass Index (BMI), Body Fat Percentage, Waist-to-Hip Ratio (WHR), and Waist-to-Height Ratio (WHtR).</p>
+    <p>This health analysis tool evaluates Body Mass Index (BMI), Body Fat Percentage, Waist-to-Hip Ratio (WHR), Waist-to-Height Ratio (WHtR), and Daily Calorie Requirements (BMR & TDEE using Mifflin-St Jeor equation).</p>
 </article>
 
 <script>
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxbCneZmL2GTLmj8QbbY4XabiSOQSLXL-EN_Bwx458D4cSA_-I0B1dze5srXSmeVs8t/exec";
 
-    let currentReportData = null;
+    let fitnessProReportData = null;
 
     function sendDataToGoogleSheet(payload) {
         if (!GOOGLE_SCRIPT_URL) return;
@@ -461,18 +529,27 @@
         evt.currentTarget.classList.add('active');
         document.getElementById(id).classList.add('active');
 
-        // Hide floating pointer when Fitness Pro tab is activated
-        const pointer = document.getElementById('fit-pointer');
-        if (id === 'fit-sec') {
-            pointer.style.display = 'none';
+        // Manage floating badges visibility
+        const floatCal = document.getElementById('float-cal');
+        const floatFit = document.getElementById('float-fit');
+        
+        if (id === 'cal-sec') {
+            floatCal.style.display = 'none';
+            floatFit.style.display = 'block';
+        } else if (id === 'fit-sec') {
+            floatCal.style.display = 'block';
+            floatFit.style.display = 'none';
         } else {
-            pointer.style.display = 'flex';
+            floatCal.style.display = 'block';
+            floatFit.style.display = 'block';
         }
     }
 
-    function switchTabToFitPro() {
-        const fitTab = document.getElementById('tab-fit');
-        fitTab.click();
+    function showTabDirect(secId, tabId) {
+        const tabEl = document.getElementById(tabId);
+        if (tabEl) {
+            tabEl.click();
+        }
     }
 
     function toggleHeight(prefix) {
@@ -494,10 +571,11 @@
     const Theme = {
         green: { bg: 'var(--green-bg)', text: 'var(--green-text)', border: 'var(--green-border)', rgb: [46, 125, 50] },
         orange: { bg: 'var(--orange-bg)', text: 'var(--orange-text)', border: 'var(--orange-border)', rgb: [230, 81, 0] },
-        red: { bg: 'var(--red-bg)', text: 'var(--red-text)', border: 'var(--red-border)', rgb: [198, 40, 40] }
+        red: { bg: 'var(--red-bg)', text: 'var(--red-text)', border: 'var(--red-border)', rgb: [198, 40, 40] },
+        blue: { bg: 'var(--blue-bg)', text: 'var(--blue-text)', border: 'var(--blue-border)', rgb: [21, 101, 192] }
     };
 
-    function renderCard(title, value, status, theme, normalRange, targetInfo, tip) {
+    function renderCard(title, value, status, theme, normalRange, targetInfo, tip, extraContent) {
         return `
         <div class="result-card" style="background:${theme.bg}; color:${theme.text}; border-color:${theme.border}">
             <div class="res-top">
@@ -509,6 +587,7 @@
             </div>
             ${normalRange ? `<div class="res-target"><b>Normal Range:</b> ${normalRange}</div>` : ''}
             ${targetInfo ? `<div class="res-target"><b>Target Guidance:</b> ${targetInfo}</div>` : ''}
+            ${extraContent ? extraContent : ''}
             <div class="tip-box" style="border-color:${theme.text}">
                 <b>Tip:</b> ${tip}
             </div>
@@ -554,7 +633,7 @@
                 return { level: 'High', theme: Theme.red, tip: 'Overweight with elevated waist ratios. High indication for aerobic exercise and nutritional adjustment.' };
             }
             return { level: 'Moderate', theme: Theme.orange, tip: 'Slightly elevated weight with standard proportions. Moderate overall cardiovascular risk.' };
-        } else { // Obese
+        } else {
             if (isAndroid) {
                 return { level: 'Very High', theme: Theme.red, tip: 'Obesity combined with central fat distribution. Strong indication to consult a physician.' };
             }
@@ -562,6 +641,7 @@
         }
     }
 
+    // Tab 1 Calculation: BMI Only
     function calculateOnlyBMI() {
         const wUnit = document.getElementById('bmi-w-unit').value;
         const rawW = parseFloat(document.getElementById('bmi-w').value) || 0;
@@ -576,17 +656,63 @@
         const evalBMI = getBMIEvaluation(bmi, age, h, wUnit);
 
         let html = renderCard('BMI Score', bmi, evalBMI.status, evalBMI.theme, evalBMI.range, evalBMI.targetInfo, evalBMI.tip);
-
         document.getElementById('bmi-only-res').innerHTML = html;
-
-        currentReportData = {
-            type: 'BMI Only', age, gender: g, weight: `${rawW} ${wUnit}`, height: `${h.toFixed(1)} cm`,
-            neck: '-', waist: '-', hip: '-', bmi, evalBMI, bodyFat: null, whr: null, whtr: null, metabolicRisk: null
-        };
 
         sendDataToGoogleSheet({ age, gender: g, height: h.toFixed(1), weight: w.toFixed(1), bmi, bodyFat: "-", whr: "-", whtr: "-" });
     }
 
+    // Tab 2 Calculation: Calorie Check Only (Mifflin-St Jeor)
+    function calculateOnlyCalories() {
+        const wUnit = document.getElementById('cal-w-unit').value;
+        const rawW = parseFloat(document.getElementById('cal-w').value) || 0;
+        const w = toKg(rawW, wUnit);
+        const h = getCmValue('cal');
+        const age = parseInt(document.getElementById('cal-age').value) || 0;
+        const g = document.getElementById('cal-gender').value;
+        const activityMultiplier = parseFloat(document.getElementById('cal-activity').value) || 1.55;
+
+        if (!w || h < 50 || !age) return alert("Please fill in Age, Height, and Weight.");
+
+        let bmrVal = (g === 'male') ? (10 * w) + (6.25 * h) - (5 * age) + 5 : (10 * w) + (6.25 * h) - (5 * age) - 161;
+        const bmr = Math.round(bmrVal);
+        const tdee = Math.round(bmr * activityMultiplier);
+        const weightLossCal = Math.round(tdee - 500);
+        const muscleGainCal = Math.round(tdee + 250);
+
+        const calorieExtraHtml = `
+            <div class="calorie-breakdown">
+                <div class="cal-box">
+                    <div class="cal-title">Weight Loss</div>
+                    <div class="cal-num">${weightLossCal}</div>
+                    <div style="font-size:0.6rem; opacity:0.75;">cal/day (-0.5kg/wk)</div>
+                </div>
+                <div class="cal-box">
+                    <div class="cal-title">Maintenance</div>
+                    <div class="cal-num">${tdee}</div>
+                    <div style="font-size:0.6rem; opacity:0.75;">cal/day (TDEE)</div>
+                </div>
+                <div class="cal-box">
+                    <div class="cal-title">Muscle Gain</div>
+                    <div class="cal-num">${muscleGainCal}</div>
+                    <div style="font-size:0.6rem; opacity:0.75;">cal/day (+0.25kg/wk)</div>
+                </div>
+            </div>`;
+
+        let html = renderCard(
+            'Daily Calorie Budget (TDEE)', 
+            `${tdee} kcal`, 
+            `BMR: ${bmr} kcal`, 
+            Theme.blue, 
+            null, 
+            `Basal Metabolic Rate (BMR): ${bmr} kcal/day burned at rest.`, 
+            'TDEE represents total daily calories burned with activity. Adjust intake based on your fitness goals.',
+            calorieExtraHtml
+        );
+
+        document.getElementById('cal-only-res').innerHTML = html;
+    }
+
+    // Tab 3 Calculation: Fitness Pro All-in-One Analysis
     function calculateFullFitness() {
         const wUnit = document.getElementById('fit-w-unit').value;
         const rawW = parseFloat(document.getElementById('fit-w').value) || 0;
@@ -595,14 +721,15 @@
         const rawN = parseFloat(document.getElementById('fit-neck').value) || 0;
         const n = unitToCm(rawN, document.getElementById('fit-n-unit').value);
         const rawWa = parseFloat(document.getElementById('fit-waist').value) || 0;
-        const wa = unitToCm(rawWa, document.getElementById('fit-waist-unit') ? document.getElementById('fit-waist-unit').value : document.getElementById('fit-wa-unit').value);
+        const wa = unitToCm(rawWa, document.getElementById('fit-wa-unit').value);
         const rawHi = parseFloat(document.getElementById('fit-hip').value) || 0;
         const hi = unitToCm(rawHi, document.getElementById('fit-hi-unit').value);
         const g = document.getElementById('fit-gender').value;
         const age = parseInt(document.getElementById('fit-age').value) || 0;
+        const activityMultiplier = parseFloat(document.getElementById('fit-activity').value) || 1.55;
 
-        if (!w || h < 50 || !wa || !n || !hi) {
-            return alert("Please fill in all inputs (Height, Weight, Neck, Waist, and Hip) to perform Fitness Pro analysis.");
+        if (!w || h < 50 || !wa || !n || !hi || !age) {
+            return alert("Please fill in all inputs (Age, Height, Weight, Neck, Waist, and Hip) in Fitness Pro to run complete analysis.");
         }
 
         if (g === 'male' && wa <= n) {
@@ -613,10 +740,13 @@
         }
 
         let html = '';
+        
+        // 1. BMI Calculation
         const bmi = (w / ((h/100)**2)).toFixed(1);
         const evalBMI = getBMIEvaluation(bmi, age, h, wUnit);
         html += renderCard('BMI Score', bmi, evalBMI.status, evalBMI.theme, evalBMI.range, evalBMI.targetInfo, evalBMI.tip);
 
+        // 2. Body Fat % Calculation
         let bfatVal = 0;
         if (g === 'male') {
             bfatVal = 495 / (1.0324 - 0.19077 * Math.log10(wa - n) + 0.15456 * Math.log10(h)) - 450;
@@ -638,6 +768,7 @@
         }
         html += renderCard('Body Fat Percentage', `${bfat}%`, bfatStatus, bfatTheme, bfatRange, null, bfatTip);
 
+        // 3. WHR Calculation
         const whr = (wa / hi).toFixed(2);
         const whrLimit = (g === 'male') ? 0.90 : 0.85;
         const targetWaistFromHip = (hi * whrLimit).toFixed(1);
@@ -646,6 +777,7 @@
         let whrTip = (whr <= whrLimit) ? 'Good fat distribution with low central fat accumulation.' : 'Higher visceral fat. Add aerobic conditioning and reduce processed intake.';
         html += renderCard('Waist-to-Hip Ratio (WHR)', whr, whrStatus, whrTheme, `≤ ${whrLimit}`, `Ideal waist for current hip: ≤ ${targetWaistFromHip} cm`, whrTip);
 
+        // 4. WHtR Calculation
         const whtr = (wa / h).toFixed(2);
         const targetWaistFromH = (h * 0.5).toFixed(1);
         let whtrTheme = (whtr <= 0.50) ? Theme.green : Theme.red;
@@ -653,17 +785,56 @@
         let whtrTip = (whtr <= 0.50) ? 'Your waist size is safely under half your height.' : 'Waist is more than half your height. Focus on reducing waist circumference.';
         html += renderCard('Waist-to-Height Ratio (WHtR)', whtr, whtrStatus, whtrTheme, '≤ 0.50', `Keep waist size under: ≤ ${targetWaistFromH} cm`, whtrTip);
 
+        // 5. BMR & TDEE Calorie Requirements
+        let bmrVal = (g === 'male') ? (10 * w) + (6.25 * h) - (5 * age) + 5 : (10 * w) + (6.25 * h) - (5 * age) - 161;
+        const bmr = Math.round(bmrVal);
+        const tdee = Math.round(bmr * activityMultiplier);
+        const weightLossCal = Math.round(tdee - 500);
+        const muscleGainCal = Math.round(tdee + 250);
+
+        const calorieExtraHtml = `
+            <div class="calorie-breakdown">
+                <div class="cal-box">
+                    <div class="cal-title">Weight Loss</div>
+                    <div class="cal-num">${weightLossCal}</div>
+                    <div style="font-size:0.6rem; opacity:0.75;">cal/day (-0.5kg/wk)</div>
+                </div>
+                <div class="cal-box">
+                    <div class="cal-title">Maintenance</div>
+                    <div class="cal-num">${tdee}</div>
+                    <div style="font-size:0.6rem; opacity:0.75;">cal/day (TDEE)</div>
+                </div>
+                <div class="cal-box">
+                    <div class="cal-title">Muscle Gain</div>
+                    <div class="cal-num">${muscleGainCal}</div>
+                    <div style="font-size:0.6rem; opacity:0.75;">cal/day (+0.25kg/wk)</div>
+                </div>
+            </div>`;
+
+        html += renderCard(
+            'Daily Calorie Budget (TDEE)', 
+            `${tdee} kcal`, 
+            `BMR: ${bmr} kcal`, 
+            Theme.blue, 
+            null, 
+            `Basal Metabolic Rate (BMR): ${bmr} kcal/day burned at rest.`, 
+            'TDEE represents total daily calories burned with activity. Adjust intake based on your fitness goals.',
+            calorieExtraHtml
+        );
+
+        // 6. Metabolic Risk Evaluation
         const isAndroid = (whr > whrLimit) || (whtr > 0.50);
         const riskEval = evaluateMetabolicRisk(evalBMI.rawCategory, isAndroid);
+        html += renderCard('Metabolic / Cardiovascular Risk', riskEval.level, `${riskEval.level} Risk`, riskEval.theme, null, null, riskEval.tip);
 
-        html += renderCard('Metabolic or Cardiovascular Disease Risk', riskEval.level, `${riskEval.level} Risk`, riskEval.theme, null, null, riskEval.tip);
-
+        // PDF Download Button (Only in Fitness Pro)
         html += `<button class="btn-pdf" onclick="promptAndGeneratePDF()">📄 Download PDF Summary</button>`;
 
         document.getElementById('fit-pro-res').innerHTML = html;
 
-        currentReportData = {
-            type: 'Full Fitness Pro', age, gender: g, weight: `${rawW} ${wUnit}`, height: `${h.toFixed(1)} cm`,
+        // Save isolated report data ONLY from Fitness Pro
+        fitnessProReportData = {
+            age, gender: g, weight: `${rawW} ${wUnit}`, height: `${h.toFixed(1)} cm`,
             neck: `${rawN} ${document.getElementById('fit-n-unit').value}`,
             waist: `${rawWa} ${document.getElementById('fit-wa-unit').value}`,
             hip: `${rawHi} ${document.getElementById('fit-hi-unit').value}`,
@@ -671,6 +842,7 @@
             bodyFat: { val: `${bfat}%`, status: bfatStatus, range: bfatRange, tip: bfatTip, theme: bfatTheme },
             whr: { val: whr, status: whrStatus, range: `≤ ${whrLimit}`, tip: whrTip, theme: whrTheme },
             whtr: { val: whtr, status: whtrStatus, range: '≤ 0.50', tip: whtrTip, theme: whtrTheme },
+            calories: { bmr, tdee, weightLossCal, muscleGainCal },
             metabolicRisk: riskEval
         };
 
@@ -678,17 +850,17 @@
     }
 
     function promptAndGeneratePDF() {
-        if (!currentReportData) return alert("Please calculate your metrics first!");
+        if (!fitnessProReportData) return alert("Please click 'Run Fitness Pro Analysis' first to generate your complete fitness report.");
         const userName = prompt("Enter the name for your report:", "Joash Sam");
         if (userName === null) return;
         generateDirectPDF(userName.trim() || "Valued User");
     }
 
-    // ENHANCED VIBRANT VECTOR JSPDF GENERATOR
+    // PURE VECTOR JSPDF GENERATOR (Derived strictly from Fitness Pro Data)
     function generateDirectPDF(userName) {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        const d = currentReportData;
+        const d = fitnessProReportData;
         const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
         // 1. Top Decorative Header Banner
@@ -728,7 +900,7 @@
 
         doc.setFont("Helvetica", "normal");
         doc.setTextColor(60, 60, 60);
-        doc.text(`Age: ${d.age || 'N/A'} yrs`, 22, y + 17);
+        doc.text(`Age: ${d.age} yrs`, 22, y + 17);
         doc.text(`Gender: ${d.gender.toUpperCase()}`, 112, y + 17);
 
         doc.text(`Weight: ${d.weight}  |  Height: ${d.height}`, 22, y + 25);
@@ -746,17 +918,15 @@
 
         // Helper to Draw Colorful Metric Box
         function addMetricBox(title, val, status, range, tip, theme) {
-            if (y > 240) { doc.addPage(); y = 20; }
+            if (y > 245) { doc.addPage(); y = 20; }
             
             const cleanRange = String(range).replace(/≤/g, '<=').replace(/≥/g, '>=');
             const rgb = (theme && theme.rgb) ? theme.rgb : [26, 115, 232];
 
-            // Box Container
             doc.setFillColor(255, 255, 255);
             doc.setDrawColor(220, 225, 230);
             doc.roundedRect(15, y, 180, 27, 3, 3, "FD");
 
-            // Colored Left Accent Bar
             doc.setFillColor(rgb[0], rgb[1], rgb[2]);
             doc.rect(15, y, 3.5, 27, "F");
 
@@ -765,7 +935,6 @@
             doc.setTextColor(30, 30, 30);
             doc.text(`${title}: ${val}`, 22, y + 8);
 
-            // Status Badge (Pill Style)
             doc.setFillColor(rgb[0], rgb[1], rgb[2]);
             doc.roundedRect(132, y + 3, 58, 6.5, 2, 2, "F");
             doc.setFont("Helvetica", "bold");
@@ -784,44 +953,73 @@
             y += 32;
         }
 
-        // 1. BMI
+        // 1. BMI Box
         addMetricBox("BMI (Body Mass Index)", d.bmi, d.evalBMI.status, d.evalBMI.range, d.evalBMI.tip, d.evalBMI.theme);
 
-        // 2. Body Fat %
-        if (d.bodyFat) {
-            addMetricBox("Body Fat Percentage", d.bodyFat.val, d.bodyFat.status, d.bodyFat.range, d.bodyFat.tip, d.bodyFat.theme);
+        // 2. Body Fat % Box
+        addMetricBox("Body Fat Percentage", d.bodyFat.val, d.bodyFat.status, d.bodyFat.range, d.bodyFat.tip, d.bodyFat.theme);
+
+        // 3. WHR Box
+        addMetricBox("Waist-to-Hip Ratio (WHR)", d.whr.val, d.whr.status, d.whr.range, d.whr.tip, d.whr.theme);
+
+        // 4. WHtR Box
+        addMetricBox("Waist-to-Height Ratio (WHtR)", d.whtr.val, d.whtr.status, d.whtr.range, d.whtr.tip, d.whtr.theme);
+
+        // 5. Calorie Budget (BMR & TDEE Box)
+        if (d.calories) {
+            if (y > 240) { doc.addPage(); y = 20; }
+            
+            doc.setFillColor(255, 255, 255);
+            doc.setDrawColor(220, 225, 230);
+            doc.roundedRect(15, y, 180, 30, 3, 3, "FD");
+
+            doc.setFillColor(21, 101, 192);
+            doc.rect(15, y, 3.5, 30, "F");
+
+            doc.setFont("Helvetica", "bold");
+            doc.setFontSize(10.5);
+            doc.setTextColor(30, 30, 30);
+            doc.text(`Daily Calorie Budget (TDEE): ${d.calories.tdee} kcal/day`, 22, y + 8);
+
+            doc.setFillColor(21, 101, 192);
+            doc.roundedRect(132, y + 3, 58, 6.5, 2, 2, "F");
+            doc.setFont("Helvetica", "bold");
+            doc.setFontSize(7.5);
+            doc.setTextColor(255, 255, 255);
+            doc.text(`BMR: ${d.calories.bmr} KCAL`, 161, y + 7.5, { align: "center" });
+
+            doc.setFont("Helvetica", "normal");
+            doc.setFontSize(8.5);
+            doc.setTextColor(60, 60, 60);
+            doc.text(`• Maintenance: ${d.calories.tdee} kcal  |  • Weight Loss: ${d.calories.weightLossCal} kcal  |  • Muscle Gain: ${d.calories.muscleGainCal} kcal`, 22, y + 16);
+
+            doc.setFont("Helvetica", "italic");
+            doc.setFontSize(8);
+            doc.setTextColor(100, 100, 100);
+            doc.text(`Calculated via Mifflin-St Jeor formula based on age, height, weight, and activity level.`, 22, y + 24);
+
+            y += 35;
         }
 
-        // 3. WHR
-        if (d.whr) {
-            addMetricBox("Waist-to-Hip Ratio (WHR)", d.whr.val, d.whr.status, d.whr.range, d.whr.tip, d.whr.theme);
-        }
-
-        // 4. WHtR
-        if (d.whtr) {
-            addMetricBox("Waist-to-Height Ratio (WHtR)", d.whtr.val, d.whtr.status, d.whtr.range, d.whtr.tip, d.whtr.theme);
-        }
-
-        // Overall Risk Summary Box
+        // 6. Overall Risk Summary Box
         if (d.metabolicRisk) {
-            y += 2;
+            if (y > 245) { doc.addPage(); y = 20; }
             const rgb = d.metabolicRisk.theme.rgb;
 
             doc.setFillColor(248, 249, 250);
             doc.setDrawColor(rgb[0], rgb[1], rgb[2]);
             doc.roundedRect(15, y, 180, 24, 3, 3, "FD");
 
-            // Left risk highlight bar
             doc.setFillColor(rgb[0], rgb[1], rgb[2]);
             doc.rect(15, y, 4, 24, "F");
 
             doc.setFont("Helvetica", "bold");
             doc.setFontSize(10.5);
             doc.setTextColor(26, 60, 94);
-            doc.text(`Metabolic or Cardiovascular Disease Risk: `, 22, y + 9);
+            doc.text(`Metabolic / Cardiovascular Risk: `, 22, y + 9);
             
             doc.setTextColor(rgb[0], rgb[1], rgb[2]);
-            doc.text(`${d.metabolicRisk.level.toUpperCase()} RISK`, 108, y + 9);
+            doc.text(`${d.metabolicRisk.level.toUpperCase()} RISK`, 95, y + 9);
 
             doc.setFont("Helvetica", "normal");
             doc.setFontSize(8.5);
@@ -833,6 +1031,7 @@
         }
 
         // Medical Disclaimer Footer
+        if (y > 260) { doc.addPage(); y = 20; }
         doc.setFont("Helvetica", "italic");
         doc.setFontSize(8);
         doc.setTextColor(120, 120, 120);
@@ -842,7 +1041,6 @@
         
         doc.text(wrappedDisclaimer, 105, y, { align: "center" });
 
-        // Save PDF file cleanly
         doc.save(`Fitness_Report_${userName.replace(/[^a-z0-9]/gi, '_')}.pdf`);
     }
 
