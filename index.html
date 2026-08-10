@@ -207,6 +207,46 @@
         .cal-title { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; opacity: 0.8; }
         .cal-num { font-size: 0.95rem; font-weight: 800; margin-top: 2px; }
 
+        /* Macronutrient Control & Display Styles */
+        .macro-container {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed rgba(0, 0, 0, 0.12);
+        }
+        .macro-title-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .macro-title { font-size: 0.78rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+        .macro-select {
+            width: auto;
+            padding: 4px 8px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            background: #ffffff;
+            cursor: pointer;
+        }
+        .macro-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            text-align: center;
+        }
+        .macro-card {
+            background: #ffffff;
+            padding: 8px 4px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+        .macro-card-title { font-size: 0.65rem; font-weight: 700; color: #4a5568; text-transform: uppercase; }
+        .macro-card-val { font-size: 0.95rem; font-weight: 800; color: var(--navy); margin: 2px 0; }
+        .macro-card-sub { font-size: 0.62rem; color: #718096; font-weight: 600; }
+
         .disclaimer { font-size: 0.7rem; color: #5f6368; line-height: 1.5; background: rgba(255, 255, 255, 0.6); padding: 15px; border-radius: 14px; margin-top: 20px; border: 1px solid #cbd5e0; text-align: center; }
 
         .seo-info-container { width: 100%; max-width: 580px; margin-top: 30px; font-size: 0.82rem; color: #4a5568; line-height: 1.6; }
@@ -325,10 +365,10 @@
     <div class="tabs-container">
         <!-- Floating Pointer Badges -->
         <div id="float-cal" class="floater-badge" onclick="showTabDirect('cal-sec', 'tab-cal')">
-            Check Calorie Need
+             Check Calorie Needs
         </div>
         <div id="float-fit" class="floater-badge" onclick="showTabDirect('fit-sec', 'tab-fit')">
-            Complete Fitness Profile
+             Complete Fitness Profile
         </div>
 
         <div class="tabs">
@@ -357,7 +397,7 @@
         <div id="bmi-only-res" class="results-container"></div>
     </div>
 
-    <!-- Section 2: Calorie Check Section (Standalone BMR & TDEE) -->
+    <!-- Section 2: Calorie Check Section (Standalone BMR & TDEE + Macro Breakdown) -->
     <div id="cal-sec" class="section">
         <div class="grid">
             <div><label>Age</label><input type="number" id="cal-age" placeholder="Years"></div>
@@ -505,13 +545,14 @@
 
 <article class="seo-info-container">
     <h2>About the Fitness & Body Composition Calculator</h2>
-    <p>This health analysis tool evaluates Body Mass Index (BMI), Body Fat Percentage, Waist-to-Hip Ratio (WHR), Waist-to-Height Ratio (WHtR), and Daily Calorie Requirements (BMR & TDEE using Mifflin-St Jeor equation).</p>
+    <p>This health analysis tool evaluates Body Mass Index (BMI), Body Fat Percentage, Waist-to-Hip Ratio (WHR), Waist-to-Height Ratio (WHtR), and Daily Calorie Requirements (BMR & TDEE using Mifflin-St Jeor equation) alongside macronutrient breakdowns.</p>
 </article>
 
 <script>
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxbCneZmL2GTLmj8QbbY4XabiSOQSLXL-EN_Bwx458D4cSA_-I0B1dze5srXSmeVs8t/exec";
 
     let fitnessProReportData = null;
+    let activeCalorieData = { cal: {}, fit: {} };
 
     function sendDataToGoogleSheet(payload) {
         if (!GOOGLE_SCRIPT_URL) return;
@@ -641,6 +682,98 @@
         }
     }
 
+    // Helper: Compute Macros based on Goal Strategy and Total Calories
+    function computeMacros(totalCalories, goal) {
+        let pPct = 0.20, cPct = 0.50, fPct = 0.30;
+        
+        if (goal === 'fat_loss') {
+            pPct = 0.30; cPct = 0.40; fPct = 0.30;
+        } else if (goal === 'muscle_gain') {
+            pPct = 0.30; cPct = 0.40; fPct = 0.30;
+        }
+
+        const pGrams = Math.round((totalCalories * pPct) / 4);
+        const cGrams = Math.round((totalCalories * cPct) / 4);
+        const fGrams = Math.round((totalCalories * fPct) / 9);
+
+        return {
+            goalName: goal === 'fat_loss' ? 'Fat Loss' : goal === 'muscle_gain' ? 'Muscle Gain' : 'Balanced Maintenance',
+            pPct: Math.round(pPct * 100), cPct: Math.round(cPct * 100), fPct: Math.round(fPct * 100),
+            pGrams, cGrams, fGrams
+        };
+    }
+
+    // Helper: Render HTML for Calorie Breakdown & Interactive Macro Selector
+    function buildCalorieAndMacroHtml(prefix, caloriesObj) {
+        const goalSelId = `${prefix}-macro-goal`;
+        const currentGoal = document.getElementById(goalSelId) ? document.getElementById(goalSelId).value : 'maintenance';
+        
+        // Select target calories based on macro goal choice
+        let targetCal = caloriesObj.tdee;
+        if (currentGoal === 'fat_loss') targetCal = caloriesObj.weightLossCal;
+        else if (currentGoal === 'muscle_gain') targetCal = caloriesObj.muscleGainCal;
+
+        const m = computeMacros(targetCal, currentGoal);
+
+        return `
+            <div class="calorie-breakdown">
+                <div class="cal-box">
+                    <div class="cal-title">Weight Loss</div>
+                    <div class="cal-num">${caloriesObj.weightLossCal}</div>
+                    <div style="font-size:0.6rem; opacity:0.75;">cal/day (-0.5kg/wk)</div>
+                </div>
+                <div class="cal-box">
+                    <div class="cal-title">Maintenance</div>
+                    <div class="cal-num">${caloriesObj.tdee}</div>
+                    <div style="font-size:0.6rem; opacity:0.75;">cal/day (TDEE)</div>
+                </div>
+                <div class="cal-box">
+                    <div class="cal-title">Muscle Gain</div>
+                    <div class="cal-num">${caloriesObj.muscleGainCal}</div>
+                    <div style="font-size:0.6rem; opacity:0.75;">cal/day (+0.25kg/wk)</div>
+                </div>
+            </div>
+
+            <div class="macro-container">
+                <div class="macro-title-bar">
+                    <div class="macro-title">⚡ Daily Macronutrient Targets</div>
+                    <select id="${goalSelId}" class="macro-select" onchange="updateMacroBreakdown('${prefix}')">
+                        <option value="maintenance" ${currentGoal === 'maintenance' ? 'selected' : ''}>🥗 Balanced Maintenance</option>
+                        <option value="fat_loss" ${currentGoal === 'fat_loss' ? 'selected' : ''}>🔥 Fat Loss Split</option>
+                        <option value="muscle_gain" ${currentGoal === 'muscle_gain' ? 'selected' : ''}>💪 Muscle Gain Split</option>
+                    </select>
+                </div>
+                <div class="macro-grid">
+                    <div class="macro-card">
+                        <div class="macro-card-title">Protein (${m.pPct}%)</div>
+                        <div class="macro-card-val" id="${prefix}-p-val">${m.pGrams}g</div>
+                        <div class="macro-card-sub">${m.pGrams * 4} kcal</div>
+                    </div>
+                    <div class="macro-card">
+                        <div class="macro-card-title">Carbs (${m.cPct}%)</div>
+                        <div class="macro-card-val" id="${prefix}-c-val">${m.cGrams}g</div>
+                        <div class="macro-card-sub">${m.cGrams * 4} kcal</div>
+                    </div>
+                    <div class="macro-card">
+                        <div class="macro-card-title">Fats (${m.fPct}%)</div>
+                        <div class="macro-card-val" id="${prefix}-f-val">${m.fGrams}g</div>
+                        <div class="macro-card-sub">${m.fGrams * 9} kcal</div>
+                    </div>
+                </div>
+            </div>`;
+    }
+
+    function updateMacroBreakdown(prefix) {
+        const calData = activeCalorieData[prefix];
+        if (!calData || !calData.tdee) return;
+
+        if (prefix === 'cal') {
+            calculateOnlyCalories();
+        } else if (prefix === 'fit') {
+            calculateFullFitness();
+        }
+    }
+
     // Tab 1 Calculation: BMI Only
     function calculateOnlyBMI() {
         const wUnit = document.getElementById('bmi-w-unit').value;
@@ -679,24 +812,10 @@
         const weightLossCal = Math.round(tdee - 500);
         const muscleGainCal = Math.round(tdee + 250);
 
-        const calorieExtraHtml = `
-            <div class="calorie-breakdown">
-                <div class="cal-box">
-                    <div class="cal-title">Weight Loss</div>
-                    <div class="cal-num">${weightLossCal}</div>
-                    <div style="font-size:0.6rem; opacity:0.75;">cal/day (-0.5kg/wk)</div>
-                </div>
-                <div class="cal-box">
-                    <div class="cal-title">Maintenance</div>
-                    <div class="cal-num">${tdee}</div>
-                    <div style="font-size:0.6rem; opacity:0.75;">cal/day (TDEE)</div>
-                </div>
-                <div class="cal-box">
-                    <div class="cal-title">Muscle Gain</div>
-                    <div class="cal-num">${muscleGainCal}</div>
-                    <div style="font-size:0.6rem; opacity:0.75;">cal/day (+0.25kg/wk)</div>
-                </div>
-            </div>`;
+        const caloriesObj = { bmr, tdee, weightLossCal, muscleGainCal };
+        activeCalorieData['cal'] = caloriesObj;
+
+        const calorieExtraHtml = buildCalorieAndMacroHtml('cal', caloriesObj);
 
         let html = renderCard(
             'Daily Calorie Budget (TDEE)', 
@@ -705,7 +824,7 @@
             Theme.blue, 
             null, 
             `Basal Metabolic Rate (BMR): ${bmr} kcal/day burned at rest.`, 
-            'TDEE represents total daily calories burned with activity. Adjust intake based on your fitness goals.',
+            'TDEE represents total daily calories burned with activity. Select a macronutrient strategy above to see your exact daily grams.',
             calorieExtraHtml
         );
 
@@ -785,31 +904,17 @@
         let whtrTip = (whtr <= 0.50) ? 'Your waist size is safely under half your height.' : 'Waist is more than half your height. Focus on reducing waist circumference.';
         html += renderCard('Waist-to-Height Ratio (WHtR)', whtr, whtrStatus, whtrTheme, '≤ 0.50', `Keep waist size under: ≤ ${targetWaistFromH} cm`, whtrTip);
 
-        // 5. BMR & TDEE Calorie Requirements
+        // 5. BMR & TDEE Calorie Requirements + Macros
         let bmrVal = (g === 'male') ? (10 * w) + (6.25 * h) - (5 * age) + 5 : (10 * w) + (6.25 * h) - (5 * age) - 161;
         const bmr = Math.round(bmrVal);
         const tdee = Math.round(bmr * activityMultiplier);
         const weightLossCal = Math.round(tdee - 500);
         const muscleGainCal = Math.round(tdee + 250);
 
-        const calorieExtraHtml = `
-            <div class="calorie-breakdown">
-                <div class="cal-box">
-                    <div class="cal-title">Weight Loss</div>
-                    <div class="cal-num">${weightLossCal}</div>
-                    <div style="font-size:0.6rem; opacity:0.75;">cal/day (-0.5kg/wk)</div>
-                </div>
-                <div class="cal-box">
-                    <div class="cal-title">Maintenance</div>
-                    <div class="cal-num">${tdee}</div>
-                    <div style="font-size:0.6rem; opacity:0.75;">cal/day (TDEE)</div>
-                </div>
-                <div class="cal-box">
-                    <div class="cal-title">Muscle Gain</div>
-                    <div class="cal-num">${muscleGainCal}</div>
-                    <div style="font-size:0.6rem; opacity:0.75;">cal/day (+0.25kg/wk)</div>
-                </div>
-            </div>`;
+        const caloriesObj = { bmr, tdee, weightLossCal, muscleGainCal };
+        activeCalorieData['fit'] = caloriesObj;
+
+        const calorieExtraHtml = buildCalorieAndMacroHtml('fit', caloriesObj);
 
         html += renderCard(
             'Daily Calorie Budget (TDEE)', 
@@ -818,7 +923,7 @@
             Theme.blue, 
             null, 
             `Basal Metabolic Rate (BMR): ${bmr} kcal/day burned at rest.`, 
-            'TDEE represents total daily calories burned with activity. Adjust intake based on your fitness goals.',
+            'TDEE represents total daily calories burned with activity. Select a macronutrient strategy above to see your exact daily grams.',
             calorieExtraHtml
         );
 
@@ -832,6 +937,15 @@
 
         document.getElementById('fit-pro-res').innerHTML = html;
 
+        // Current Active Macro Choice for PDF
+        const fitGoalSel = document.getElementById('fit-macro-goal');
+        const activeGoal = fitGoalSel ? fitGoalSel.value : 'maintenance';
+        let targetCalForPdf = tdee;
+        if (activeGoal === 'fat_loss') targetCalForPdf = weightLossCal;
+        else if (activeGoal === 'muscle_gain') targetCalForPdf = muscleGainCal;
+
+        const macroPdf = computeMacros(targetCalForPdf, activeGoal);
+
         // Save isolated report data ONLY from Fitness Pro
         fitnessProReportData = {
             age, gender: g, weight: `${rawW} ${wUnit}`, height: `${h.toFixed(1)} cm`,
@@ -843,6 +957,7 @@
             whr: { val: whr, status: whrStatus, range: `≤ ${whrLimit}`, tip: whrTip, theme: whrTheme },
             whtr: { val: whtr, status: whtrStatus, range: '≤ 0.50', tip: whtrTip, theme: whtrTheme },
             calories: { bmr, tdee, weightLossCal, muscleGainCal },
+            macros: macroPdf,
             metabolicRisk: riskEval
         };
 
@@ -965,16 +1080,16 @@
         // 4. WHtR Box
         addMetricBox("Waist-to-Height Ratio (WHtR)", d.whtr.val, d.whtr.status, d.whtr.range, d.whtr.tip, d.whtr.theme);
 
-        // 5. Calorie Budget (BMR & TDEE Box)
+        // 5. Calorie Budget & Macronutrient Split Box
         if (d.calories) {
-            if (y > 240) { doc.addPage(); y = 20; }
+            if (y > 235) { doc.addPage(); y = 20; }
             
             doc.setFillColor(255, 255, 255);
             doc.setDrawColor(220, 225, 230);
-            doc.roundedRect(15, y, 180, 30, 3, 3, "FD");
+            doc.roundedRect(15, y, 180, 38, 3, 3, "FD");
 
             doc.setFillColor(21, 101, 192);
-            doc.rect(15, y, 3.5, 30, "F");
+            doc.rect(15, y, 3.5, 38, "F");
 
             doc.setFont("Helvetica", "bold");
             doc.setFontSize(10.5);
@@ -993,12 +1108,19 @@
             doc.setTextColor(60, 60, 60);
             doc.text(`• Maintenance: ${d.calories.tdee} kcal  |  • Weight Loss: ${d.calories.weightLossCal} kcal  |  • Muscle Gain: ${d.calories.muscleGainCal} kcal`, 22, y + 16);
 
-            doc.setFont("Helvetica", "italic");
-            doc.setFontSize(8);
-            doc.setTextColor(100, 100, 100);
-            doc.text(`Calculated via Mifflin-St Jeor formula based on age, height, weight, and activity level.`, 22, y + 24);
+            // Add Macros
+            if (d.macros) {
+                doc.setFont("Helvetica", "bold");
+                doc.setFontSize(8.5);
+                doc.setTextColor(26, 60, 94);
+                doc.text(`Macronutrients (${d.macros.goalName}):`, 22, y + 24);
 
-            y += 35;
+                doc.setFont("Helvetica", "normal");
+                doc.setTextColor(40, 40, 40);
+                doc.text(`Protein: ${d.macros.pGrams}g (${d.macros.pPct}%)   |   Carbs: ${d.macros.cGrams}g (${d.macros.cPct}%)   |   Fats: ${d.macros.fGrams}g (${d.macros.fPct}%)`, 22, y + 31);
+            }
+
+            y += 43;
         }
 
         // 6. Overall Risk Summary Box
