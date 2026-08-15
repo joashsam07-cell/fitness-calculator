@@ -120,8 +120,8 @@
             border-top: 5px solid #ff4757;
         }
 
-        #float-cal { left: 34%; }
-        #float-fit { right: 2%; }
+        #float-fit { left: 34%; }
+        #float-cal { right: 2%; }
 
         @keyframes bouncePoint {
             0%, 100% { transform: translateY(0); }
@@ -364,22 +364,22 @@
 
     <div class="tabs-container">
         <!-- Floating Pointer Badges -->
+        <div id="float-fit" class="floater-badge" style="display: none;" onclick="showTabDirect('fit-sec', 'tab-fit')">
+             Complete Fitness Profile
+        </div>
         <div id="float-cal" class="floater-badge" onclick="showTabDirect('cal-sec', 'tab-cal')">
              Check Calorie Needs
         </div>
-        <div id="float-fit" class="floater-badge" onclick="showTabDirect('fit-sec', 'tab-fit')">
-             Complete Fitness Profile
-        </div>
 
         <div class="tabs">
-            <div id="tab-bmi" class="tab active" onclick="showTab('bmi-sec', event)">BMI Check</div>
+            <div id="tab-bmi" class="tab" onclick="showTab('bmi-sec', event)">BMI Check</div>
+            <div id="tab-fit" class="tab active" onclick="showTab('fit-sec', event)">Fitness Pro</div>
             <div id="tab-cal" class="tab" onclick="showTab('cal-sec', event)">Calorie Check</div>
-            <div id="tab-fit" class="tab" onclick="showTab('fit-sec', event)">Fitness Pro</div>
         </div>
     </div>
 
     <!-- Section 1: BMI Check Section -->
-    <div id="bmi-sec" class="section active">
+    <div id="bmi-sec" class="section">
         <div class="grid">
             <div><label>Age</label><input type="number" id="bmi-age" placeholder="Years"></div>
             <div><label>Gender</label><select id="bmi-gender"><option value="male">Male</option><option value="female">Female</option></select></div>
@@ -397,39 +397,8 @@
         <div id="bmi-only-res" class="results-container"></div>
     </div>
 
-    <!-- Section 2: Calorie Check Section (Standalone BMR & TDEE + Macro Breakdown) -->
-    <div id="cal-sec" class="section">
-        <div class="grid">
-            <div><label>Age</label><input type="number" id="cal-age" placeholder="Years"></div>
-            <div><label>Gender</label><select id="cal-gender"><option value="male">Male</option><option value="female">Female</option></select></div>
-        </div>
-        <div class="grid">
-            <div class="input-box">
-                <label>Height</label>
-                <input type="number" id="cal-h-cm" placeholder="cm">
-                <div class="dual-input hidden" id="cal-h-ftin"><input type="number" id="cal-h-ft" placeholder="Ft"><input type="number" id="cal-h-in" placeholder="In"></div>
-                <select class="unit-sel" id="cal-h-unit" onchange="toggleHeight('cal')"><option value="cm">cm</option><option value="ft">ft+in</option></select>
-            </div>
-            <div class="input-box"><label>Weight</label><input type="number" id="cal-w"><select class="unit-sel" id="cal-w-unit"><option value="kg">kg</option><option value="lb">lb</option></select></div>
-        </div>
-        <div class="grid">
-            <div class="input-box full-width">
-                <label>Daily Activity Level</label>
-                <select id="cal-activity">
-                    <option value="1.2">Sedentary — Desk job, sitting most day (Little/no exercise)</option>
-                    <option value="1.375">Lightly Active — Teacher, salesman, light walk (Exercise 1–3 days/wk)</option>
-                    <option value="1.55" selected>Moderately Active — Nurse, waiter, active work (Exercise 3–5 days/wk)</option>
-                    <option value="1.725">Very Active — Construction, athlete, heavy lifting (Exercise 6–7 days/wk)</option>
-                    <option value="1.9">Extra Active — Physical labor + hard training / 2x workouts daily</option>
-                </select>
-            </div>
-        </div>
-        <button onclick="calculateOnlyCalories()">Calculate Daily Calorie Needs</button>
-        <div id="cal-only-res" class="results-container"></div>
-    </div>
-
-    <!-- Section 3: Fitness Pro Section (All-in-One + PDF Generator) -->
-    <div id="fit-sec" class="section">
+    <!-- Section 2: Fitness Pro Section (All-in-One + PDF Generator) - DEFAULT OPENING SECTION -->
+    <div id="fit-sec" class="section active">
         <div class="grid">
             <div><label>Age</label><input type="number" id="fit-age" placeholder="Years"></div>
             <div><label>Gender</label><select id="fit-gender"><option value="male">Male</option><option value="female">Female</option></select></div>
@@ -466,6 +435,37 @@
 
         <button onclick="calculateFullFitness()">Run Fitness Pro Analysis</button>
         <div id="fit-pro-res" class="results-container"></div>
+    </div>
+
+    <!-- Section 3: Calorie Check Section (Standalone BMR & TDEE + Macro Breakdown) -->
+    <div id="cal-sec" class="section">
+        <div class="grid">
+            <div><label>Age</label><input type="number" id="cal-age" placeholder="Years"></div>
+            <div><label>Gender</label><select id="cal-gender"><option value="male">Male</option><option value="female">Female</option></select></div>
+        </div>
+        <div class="grid">
+            <div class="input-box">
+                <label>Height</label>
+                <input type="number" id="cal-h-cm" placeholder="cm">
+                <div class="dual-input hidden" id="cal-h-ftin"><input type="number" id="cal-h-ft" placeholder="Ft"><input type="number" id="cal-h-in" placeholder="In"></div>
+                <select class="unit-sel" id="cal-h-unit" onchange="toggleHeight('cal')"><option value="cm">cm</option><option value="ft">ft+in</option></select>
+            </div>
+            <div class="input-box"><label>Weight</label><input type="number" id="cal-w"><select class="unit-sel" id="cal-w-unit"><option value="kg">kg</option><option value="lb">lb</option></select></div>
+        </div>
+        <div class="grid">
+            <div class="input-box full-width">
+                <label>Daily Activity Level</label>
+                <select id="cal-activity">
+                    <option value="1.2">Sedentary — Desk job, sitting most day (Little/no exercise)</option>
+                    <option value="1.375">Lightly Active — Teacher, salesman, light walk (Exercise 1–3 days/wk)</option>
+                    <option value="1.55" selected>Moderately Active — Nurse, waiter, active work (Exercise 3–5 days/wk)</option>
+                    <option value="1.725">Very Active — Construction, athlete, heavy lifting (Exercise 6–7 days/wk)</option>
+                    <option value="1.9">Extra Active — Physical labor + hard training / 2x workouts daily</option>
+                </select>
+            </div>
+        </div>
+        <button onclick="calculateOnlyCalories()">Calculate Daily Calorie Needs</button>
+        <div id="cal-only-res" class="results-container"></div>
     </div>
 
     <!-- Lightbulb Trigger Button -->
